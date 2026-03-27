@@ -1,28 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
-const SUPABASE_URL = "https://fwktaxbgicooxmqleaho.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3a3RheGJnaWNvb3htcWxlYWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NTk3ODYsImV4cCI6MjA5MDEzNTc4Nn0._YNNkQn-jmvFziFAAWQbzxKEkpebQbYBfqg110WdDYo";
-
-async function loadData() {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/roadmap?id=eq.main&select=data`, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
-    });
-    const rows = await res.json();
-    return rows?.[0]?.data || null;
-  } catch { return null; }
-}
-
-async function saveData(data) {
-  try {
-    await fetch(`${SUPABASE_URL}/rest/v1/roadmap?id=eq.main`, {
-      method: "PATCH",
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
-      body: JSON.stringify({ data, updated_at: new Date().toISOString() })
-    });
-  } catch {}
-}
-
 const INIT_DATA = {
   sprints: [
     {
@@ -196,7 +173,6 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
       {dropPosition==="before"&&<DropIndicator/>}
       <div draggable={editable} onDragStart={editable?e=>{e.dataTransfer.effectAllowed="move";e.stopPropagation();onDragStart(feature.id);}:undefined} onDragEnd={editable?onDragEnd:undefined}
         style={{background:"#1a1a1a",border:`0.5px solid ${bc}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:"0 1px 3px rgba(0,0,0,.4)"}}>
-        {/* Header */}
         <div style={{background:"#1f1f1f",padding:"9px 10px"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
             {editable&&<span style={{color:"#444",fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2}}>⠿</span>}
@@ -221,7 +197,6 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
             <OwnersPicker owners={feature.owners||[]} onChange={v=>onUpdate(feature.id,{owners:v})} editable={editable}/>
           </div>
         </div>
-        {/* Body */}
         {!collapsed&&<div style={{padding:"8px 10px 10px"}}>
           <div style={{display:"flex",gap:5,marginBottom:8,flexWrap:"wrap"}}>
             {[["product","Product"],["design","Design"],["eng","Eng"]].map(([key,lbl])=>{
@@ -276,7 +251,7 @@ function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onU
   useClickOutside(delRef, () => setConfirmDel(false));
   return (
     <div onDragOver={e=>{if(editable){e.preventDefault();if(!sprint.features.length)onDragOverEmpty(sprint.id);}}}
-      style={{flex:1,minWidth:250,background:"#141414",borderRadius:12,padding:12,border:"0.5px solid #2a2a2a",boxSizing:"border-box"}}>
+      style={{flexShrink:0,width:280,background:"#141414",borderRadius:12,padding:12,border:"0.5px solid #2a2a2a",boxSizing:"border-box"}}>
       <div style={{marginBottom:12}}>
         <div style={{display:"flex",alignItems:"flex-start",gap:6}}>
           <div style={{flex:1}}>
@@ -284,12 +259,12 @@ function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onU
             <InlineEdit value={sprint.dates} onChange={v=>onUpdateSprint(sprint.id,{dates:v})} editable={editable} placeholder="e.g. Feb 2–13" style={{fontSize:11,color:"#555",marginTop:1,display:"block"}}/>
           </div>
           {editable&&<div ref={delRef} style={{position:"relative",flexShrink:0,marginTop:2}}>
-            <span onClick={()=>setConfirmDel(true)} title="Delete sprint" style={{fontSize:10,color:"#333",cursor:"pointer",padding:"2px 4px"}}>✕</span>
+            <span onClick={()=>setConfirmDel(true)} style={{fontSize:10,color:"#333",cursor:"pointer",padding:"2px 4px"}}>✕</span>
             {confirmDel&&<div style={{position:"absolute",top:0,right:20,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:130,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
               <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete sprint?</span>
-              <span style={{fontSize:10,color:"#6b7280"}}>All features inside will also be deleted.</span>
+              <span style={{fontSize:10,color:"#6b7280"}}>All features will be deleted.</span>
               <div style={{display:"flex",gap:6}}>
-                <button onClick={()=>onDeleteSprint(sprint.id)} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes, delete</button>
+                <button onClick={()=>onDeleteSprint(sprint.id)} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
                 <button onClick={()=>setConfirmDel(false)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
               </div>
             </div>}
@@ -307,34 +282,15 @@ function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onU
 }
 
 export default function App() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(INIT_DATA);
   const [filter, setFilter] = useState("all");
   const [editMode, setEditMode] = useState(false);
   const [draggingId, setDraggingId] = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
-  const [saveStatus, setSaveStatus] = useState("idle");
-  const saveTimer = useRef(null);
 
   const editable = editMode && filter === "all";
 
-  useEffect(() => {
-    loadData().then(remote => {
-      if (remote && remote.sprints && remote.sprints.length > 0) setData(remote);
-      else setData(INIT_DATA);
-    }).catch(() => setData(INIT_DATA));
-  }, []);
-
-  const scheduleSave = useCallback((newData) => {
-    setSaveStatus("saving");
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(async () => {
-      await saveData(newData);
-      setSaveStatus("saved");
-      setTimeout(() => setSaveStatus("idle"), 2000);
-    }, 800);
-  }, []);
-
-  const upd = useCallback(fn => setData(prev => { const next = fn(prev); scheduleSave(next); return next; }), [scheduleSave]);
+  const upd = useCallback(fn => setData(prev => fn(prev)), []);
   const updateFeature = (fid,ch) => upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.map(f=>f.id===fid?{...f,...ch}:f)}))}));
   const deleteFeature = fid => upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.filter(f=>f.id!==fid)}))}));
   const addFeature = sid => upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,features:[...s.features,{id:newId(),name:"New feature",size:"M",phases:{product:"not-started",design:"not-started",eng:"not-started"},estNum:"",estUnit:"days",note:"",owners:[],tasks:[]}]}:s)}));
@@ -367,20 +323,15 @@ export default function App() {
     setDraggingId(null);setDropTarget(null);
   },[draggingId,dropTarget,editable,upd]);
 
-  if (!data) return <div style={{background:"#0f0f0f",minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:"#555",fontFamily:"system-ui"}}>Loading roadmap…</div>;
-
   const filtered={...data,sprints:data.sprints.map(s=>({...s,features:s.features.filter(f=>{if(filter==="xl-l")return f.size==="XL"||f.size==="L";if(filter==="m-s")return f.size==="M"||f.size==="S";return true;})}))};
   const fBtn=(v,l)=><button key={v} onClick={()=>setFilter(v)} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:"0.5px solid",background:filter===v?"#2a2a2a":"transparent",color:filter===v?"#e0e0e0":"#555",borderColor:filter===v?"#444":"#2a2a2a"}}>{l}</button>;
-  const statusColor = saveStatus==="saved"?"#4ade80":saveStatus==="saving"?"#fbbf24":"transparent";
-  const statusText = saveStatus==="saved"?"✓ Saved":saveStatus==="saving"?"Saving…":"";
 
   return (
     <div onDragOver={e=>{if(editable)e.preventDefault();}} onDrop={handleDrop}
-      style={{background:"#0f0f0f",minHeight:"100vh",padding:"20px 16px",fontFamily:"system-ui,sans-serif"}}>
+      style={{background:"#0f0f0f",minHeight:"100vh",padding:"20px 16px",fontFamily:"system-ui,sans-serif",boxSizing:"border-box"}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:8}}>
         <h1 style={{fontSize:20,fontWeight:700,color:"#f0f0f0",margin:0}}>Roadmap</h1>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <span style={{fontSize:11,color:statusColor,transition:"color .3s",minWidth:60}}>{statusText}</span>
           <div style={{display:"flex",gap:4}}>{[["all","All"],["xl-l","Boulders"],["m-s","Pebbles"]].map(([v,l])=>fBtn(v,l))}</div>
           {filter==="all"&&<button onClick={()=>setEditMode(m=>!m)} style={{padding:"4px 14px",borderRadius:20,fontSize:11,cursor:"pointer",border:`0.5px solid ${editMode?"#4ade80":"#2a2a2a"}`,background:editMode?"#1a3a2a":"transparent",color:editMode?"#4ade80":"#555",transition:"all .2s"}}>{editMode?"✓ Editing":"Edit"}</button>}
           {editable&&<button onClick={addSprint} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:"0.5px solid #2a2a2a",background:"transparent",color:"#555"}}>+ Sprint</button>}
@@ -389,7 +340,7 @@ export default function App() {
       <div style={{fontSize:10,color:"#333",marginBottom:14}}>
         {editable?"Drag ⠿ to reposition · Click size to change · Click phase to advance · Click text to edit":filter==="all"?"View mode — click Edit to make changes":"View only"}
       </div>
-      <div style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:8}}>
+      <div style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16}}>
         {filtered.sprints.map(s=>(
           <SprintCol key={s.id} sprint={s} onUpdateFeature={updateFeature} onDeleteFeature={deleteFeature} onAddFeature={addFeature} onUpdateSprint={updateSprint} onDeleteSprint={deleteSprint} onDragStart={handleDragStart} onDragEnd={handleDragEnd} draggingId={draggingId} dropTarget={dropTarget} onDragOverCard={handleDragOverCard} onDragOverEmpty={handleDragOverEmpty} editable={editable}/>
         ))}
