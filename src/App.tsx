@@ -161,21 +161,23 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
   const delRef = useRef();
   useClickOutside(delRef, () => setConfirmDel(false));
 
+  const [dragging, setDragging] = useState(false);
+
   const cyclePhase = key => { if(!editable)return; const o=["not-started","in-progress","done"]; onUpdate(feature.id,{phases:{...feature.phases,[key]:o[(o.indexOf(feature.phases[key])+1)%o.length]}}); };
   const updateTask = (tid,ch) => onUpdate(feature.id,{tasks:feature.tasks.map(t=>t.id===tid?{...t,...ch}:t)});
   const addTask = () => onUpdate(feature.id,{tasks:[...feature.tasks,{id:newId(),name:"New task",owners:[]}]});
   const deleteTask = tid => onUpdate(feature.id,{tasks:feature.tasks.filter(t=>t.id!==tid)});
-  const onDragOv = e => { if(!editable)return; e.preventDefault();e.stopPropagation(); const r=cardRef.current.getBoundingClientRect(); onDragOverCard(feature.id,e.clientY<r.top+r.height/2?"before":"after"); };
+  const onDragOv = e => { if(!editable||!dragging)return; e.preventDefault();e.stopPropagation(); const r=cardRef.current.getBoundingClientRect(); onDragOverCard(feature.id,e.clientY<r.top+r.height/2?"before":"after"); };
   const bc = feature.phases.eng==="done"?"#166534":feature.phases.eng==="in-progress"?"#854d0e":"#2d2d2d";
 
   return (
     <div ref={cardRef} onDragOver={onDragOv}>
       {dropPosition==="before"&&<DropIndicator/>}
-      <div draggable={editable} onDragStart={editable?e=>{e.dataTransfer.effectAllowed="move";e.stopPropagation();onDragStart(feature.id);}:undefined} onDragEnd={editable?onDragEnd:undefined}
+      <div draggable={editable&&dragging} onDragStart={editable&&dragging?e=>{e.dataTransfer.effectAllowed="move";e.stopPropagation();onDragStart(feature.id);}:undefined} onDragEnd={editable?e=>{onDragEnd();setDragging(false);}:undefined}
         style={{background:"#1a1a1a",border:`0.5px solid ${bc}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:"0 1px 3px rgba(0,0,0,.4)"}}>
         <div style={{background:"#1f1f1f",padding:"9px 10px"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
-            {editable&&<span style={{color:"#444",fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2}}>⠿</span>}
+            {editable&&<span onMouseDown={()=>setDragging(true)} onMouseUp={()=>setDragging(false)} style={{color:"#444",fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2}}>⠿</span>}
             <SizeBadge size={feature.size} onChange={v=>onUpdate(feature.id,{size:v})} editable={editable}/>
             <InlineEdit value={feature.name} onChange={v=>onUpdate(feature.id,{name:v})} editable={editable} placeholder="Feature name" style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,color:"#f0f0f0",lineHeight:1.4}}/>
             <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:2}}>
