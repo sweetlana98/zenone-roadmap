@@ -163,7 +163,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
 
   const [dragging, setDragging] = useState(false);
 
-  const cyclePhase = key => { if(!editable)return; const o=["not-started","in-progress","done"]; onUpdate(feature.id,{phases:{...feature.phases,[key]:o[(o.indexOf(feature.phases[key])+1)%o.length]}}); };
+  const cyclePhase = key => { const o=["not-started","in-progress","done"]; onUpdate(feature.id,{phases:{...feature.phases,[key]:o[(o.indexOf(feature.phases[key])+1)%o.length]}}); };
   const updateTask = (tid,ch) => onUpdate(feature.id,{tasks:feature.tasks.map(t=>t.id===tid?{...t,...ch}:t)});
   const addTask = () => onUpdate(feature.id,{tasks:[...feature.tasks,{id:newId(),name:"New task",owners:[]}]});
   const deleteTask = tid => onUpdate(feature.id,{tasks:feature.tasks.filter(t=>t.id!==tid)});
@@ -209,7 +209,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
           <div style={{display:"flex",gap:5,marginBottom:8,flexWrap:"wrap"}}>
             {[["product","Product"],["design","Design"],["eng","Eng"]].map(([key,lbl])=>{
               const c=PHASE_CFG[feature.phases[key]];
-              return <span key={key} onClick={()=>cyclePhase(key)} style={{display:"inline-flex",alignItems:"center",background:c.bg,color:c.text,border:`0.5px solid ${c.border}`,borderRadius:4,padding:"2px 7px",fontSize:10,fontWeight:500,textDecoration:c.strike?"line-through":"none",cursor:editable?"pointer":"default",userSelect:"none",whiteSpace:"nowrap"}}>{lbl}</span>;
+              return <span key={key} onClick={()=>cyclePhase(key)} style={{display:"inline-flex",alignItems:"center",background:c.bg,color:c.text,border:`0.5px solid ${c.border}`,borderRadius:4,padding:"2px 7px",fontSize:10,fontWeight:500,textDecoration:c.strike?"line-through":"none",cursor:"pointer",userSelect:"none",whiteSpace:"nowrap"}}>{lbl}</span>;
             })}
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:3,marginBottom:6}}>
