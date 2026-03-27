@@ -1,5 +1,28 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
+const SUPABASE_URL = "https://fwktaxbgicooxmqleaho.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3a3RheGJnaWNvb3htcWxlYWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NTk3ODYsImV4cCI6MjA5MDEzNTc4Nn0._YNNkQn-jmvFziFAAWQbzxKEkpebQbYBfqg110WdDYo";
+
+async function loadData() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/roadmap?id=eq.main&select=data`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const rows = await res.json();
+    return rows?.[0]?.data || null;
+  } catch { return null; }
+}
+
+async function saveData(data) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/roadmap?id=eq.main`, {
+      method: "PATCH",
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ data, updated_at: new Date().toISOString() })
+    });
+  } catch {}
+}
+
 const INIT_DATA = {
   sprints: [
     {
@@ -290,15 +313,34 @@ function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onU
 }
 
 export default function App() {
-  const [data, setData] = useState(INIT_DATA);
+  const [data, setData] = useState(null);
   const [filter, setFilter] = useState("all");
   const [editMode, setEditMode] = useState(false);
   const [draggingId, setDraggingId] = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
+  const [saveStatus, setSaveStatus] = useState("idle");
+  const saveTimer = useRef(null);
 
   const editable = editMode && filter === "all";
 
-  const upd = useCallback(fn => setData(prev => fn(prev)), []);
+  useEffect(() => {
+    loadData().then(remote => {
+      if (remote && remote.sprints && remote.sprints.length > 0) setData(remote);
+      else setData(INIT_DATA);
+    }).catch(() => setData(INIT_DATA));
+  }, []);
+
+  const scheduleSave = useCallback((newData) => {
+    setSaveStatus("saving");
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async () => {
+      await saveData(newData);
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus("idle"), 2000);
+    }, 800);
+  }, []);
+
+  const upd = useCallback(fn => setData(prev => { const next = fn(prev); scheduleSave(next); return next; }), [scheduleSave]);
   const updateFeature = (fid,ch) => upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.map(f=>f.id===fid?{...f,...ch}:f)}))}));
   const deleteFeature = fid => upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.filter(f=>f.id!==fid)}))}));
   const addFeature = sid => upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,features:[...s.features,{id:newId(),name:"New feature",size:"M",phases:{product:"not-started",design:"not-started",eng:"not-started"},estNum:"",estUnit:"days",note:"",owners:[],tasks:[]}]}:s)}));
@@ -331,8 +373,12 @@ export default function App() {
     setDraggingId(null);setDropTarget(null);
   },[draggingId,dropTarget,editable,upd]);
 
+  if (!data) return <div style={{background:"#0f0f0f",minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:"#555",fontFamily:"system-ui"}}>Loading roadmap…</div>;
+
   const filtered={...data,sprints:data.sprints.map(s=>({...s,features:s.features.filter(f=>{if(filter==="xl-l")return f.size==="XL"||f.size==="L";if(filter==="m-s")return f.size==="M"||f.size==="S";return true;})}))};
   const fBtn=(v,l)=><button key={v} onClick={()=>setFilter(v)} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:"0.5px solid",background:filter===v?"#2a2a2a":"transparent",color:filter===v?"#e0e0e0":"#555",borderColor:filter===v?"#444":"#2a2a2a"}}>{l}</button>;
+  const statusColor = saveStatus==="saved"?"#4ade80":saveStatus==="saving"?"#fbbf24":"transparent";
+  const statusText = saveStatus==="saved"?"✓ Saved":saveStatus==="saving"?"Saving…":"";
 
   return (
     <div onDragOver={e=>{if(editable)e.preventDefault();}} onDrop={handleDrop}
@@ -340,6 +386,7 @@ export default function App() {
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:8}}>
         <h1 style={{fontSize:20,fontWeight:700,color:"#f0f0f0",margin:0}}>Roadmap</h1>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <span style={{fontSize:11,color:statusColor,minWidth:60}}>{statusText}</span>
           <div style={{display:"flex",gap:4}}>{[["all","All"],["xl-l","Boulders"],["m-s","Pebbles"]].map(([v,l])=>fBtn(v,l))}</div>
           {filter==="all"&&<button onClick={()=>setEditMode(m=>!m)} style={{padding:"4px 14px",borderRadius:20,fontSize:11,cursor:"pointer",border:`0.5px solid ${editMode?"#4ade80":"#2a2a2a"}`,background:editMode?"#1a3a2a":"transparent",color:editMode?"#4ade80":"#555",transition:"all .2s"}}>{editMode?"✓ Editing":"Edit"}</button>}
           {editable&&<button onClick={addSprint} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:"0.5px solid #2a2a2a",background:"transparent",color:"#555"}}>+ Sprint</button>}
