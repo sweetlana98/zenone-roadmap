@@ -326,11 +326,13 @@ export default function App() {
 
   const editable = editMode && filter === "all";
 
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     loadData().then(remote => {
       if (remote && remote.sprints && remote.sprints.length > 0) setData(remote);
-      else setData(INIT_DATA);
-    }).catch(() => setData(INIT_DATA));
+      else setData({ sprints: [] });
+    }).catch(e => { console.error(e); setError("Could not load data"); setData({ sprints: [] }); });
   }, []);
 
   const scheduleSave = useCallback((newData) => {
@@ -397,7 +399,10 @@ export default function App() {
     setDraggingId(null);setDropTarget(null);
   },[draggingId,dropTarget,editable,upd]);
 
-  if (!data) return <div style={{background:"#0f0f0f",minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:"#555",fontFamily:"system-ui"}}>Loading roadmap…</div>;
+  if (!data) return <div style={{background:"#0f0f0f",minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:"#555",fontFamily:"system-ui",flexDirection:"column",gap:12}}>
+    <div>Loading roadmap…</div>
+    {error && <div style={{color:"#ef4444",fontSize:12}}>{error}</div>}
+  </div>;
 
   const filtered={...data,sprints:data.sprints.map(s=>({...s,features:s.features.filter(f=>{if(filter==="xl-l")return f.size==="XL"||f.size==="L";if(filter==="m-s")return f.size==="M"||f.size==="S";return true;})}))};
   const fBtn=(v,l)=><button key={v} onClick={()=>setFilter(v)} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:"0.5px solid",background:filter===v?"#2a2a2a":"transparent",color:filter===v?"#e0e0e0":"#555",borderColor:filter===v?"#444":"#2a2a2a"}}>{l}</button>;
