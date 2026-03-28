@@ -375,6 +375,7 @@ export default function App() {
     isPanning.current = false;
     if (boardRef.current) boardRef.current.style.cursor = "grab";
   };
+  const handleDragStart = useCallback(fid=>setDraggingId(fid),[]);
   const handleDragEnd = useCallback(()=>{setDraggingId(null);setDropTarget(null);},[]);
   const handleDragOverCard = useCallback((sid,fid,pos)=>setDropTarget({sprintId:sid,featureId:fid,position:pos}),[]);
   const handleDragOverEmpty = useCallback(sid=>setDropTarget({sprintId:sid,featureId:null,position:"after"}),[]);
