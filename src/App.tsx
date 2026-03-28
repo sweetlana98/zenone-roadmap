@@ -278,16 +278,23 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
   );
 }
 
-function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onUpdateSprint, onDeleteSprint, onDragStart, onDragEnd, draggingId, dropTarget, onDragOverCard, onDragOverEmpty, editable }) {
+function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onUpdateSprint, onDeleteSprint, onDragStart, onDragEnd, draggingId, dropTarget, onDragOverCard, onDragOverEmpty, editable, onSprintDragStart, onSprintDragOver, onSprintDrop, onSprintDragEnd, isSprintDragging }) {
   const emptyTarget = editable&&dropTarget?.sprintId===sprint.id&&!dropTarget?.featureId;
   const [confirmDel, setConfirmDel] = useState(false);
+  const [sprintDragging, setSprintDragging] = useState(false);
   const delRef = useRef();
   useClickOutside(delRef, () => setConfirmDel(false));
   return (
-    <div onDragOver={e=>{if(editable){e.preventDefault();if(!sprint.features.length)onDragOverEmpty(sprint.id);}}}
-      style={{flexShrink:0,width:280,background:"#141414",borderRadius:12,padding:12,border:"0.5px solid #2a2a2a",boxSizing:"border-box"}}>
+    <div
+      draggable={editable&&sprintDragging}
+      onDragStart={editable&&sprintDragging?e=>{e.dataTransfer.effectAllowed="move";onSprintDragStart(sprint.id);}:undefined}
+      onDragEnd={editable?()=>{setSprintDragging(false);onSprintDragEnd();}:undefined}
+      onDragOver={e=>{e.preventDefault();if(editable){if(!sprint.features.length)onDragOverEmpty(sprint.id);onSprintDragOver(sprint.id);}}}
+      onDrop={e=>{e.preventDefault();if(editable)onSprintDrop(sprint.id);}}
+      style={{flexShrink:0,width:280,background:"#141414",borderRadius:12,padding:12,border:`0.5px solid ${isSprintDragging?"#534AB7":"#2a2a2a"}`,boxSizing:"border-box",opacity:isSprintDragging?0.4:1,transition:"opacity .15s"}}>
       <div style={{marginBottom:12}}>
-        <div style={{display:"flex",alignItems:"flex-start",gap:6}}>
+                  <div style={{display:"flex",alignItems:"flex-start",gap:6}}>
+            {editable&&<span onMouseDown={e=>{e.stopPropagation();setSprintDragging(true);}} onMouseUp={()=>setSprintDragging(false)} onMouseLeave={()=>setSprintDragging(false)} style={{color:"#333",fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
           <div style={{flex:1}}>
             <InlineEdit value={sprint.label} onChange={v=>onUpdateSprint(sprint.id,{label:v})} editable={editable} style={{fontSize:13,fontWeight:700,color:"#e0e0e0",display:"block"}}/>
             <InlineEdit value={sprint.dates} onChange={v=>onUpdateSprint(sprint.id,{dates:v})} editable={editable} placeholder="e.g. Feb 2–13" style={{fontSize:11,color:"#555",marginTop:1,display:"block"}}/>
@@ -375,6 +382,33 @@ export default function App() {
     isPanning.current = false;
     if (boardRef.current) boardRef.current.style.cursor = "grab";
   };
+  const onBoardMouseOverCard = e => {
+    if (!boardRef.current) return;
+    if (e.target === boardRef.current) {
+      boardRef.current.style.cursor = isPanning.current ? "grabbing" : "grab";
+    } else {
+      boardRef.current.style.cursor = "default";
+    }
+  };
+  const [draggingSprintId, setDraggingSprintId] = useState(null);
+  const [overSprintId, setOverSprintId] = useState(null);
+
+  const handleSprintDragStart = useCallback(sid => setDraggingSprintId(sid), []);
+  const handleSprintDragOver = useCallback(sid => setOverSprintId(sid), []);
+  const handleSprintDragEnd = useCallback(() => { setDraggingSprintId(null); setOverSprintId(null); }, []);
+  const handleSprintDrop = useCallback(targetId => {
+    if (!draggingSprintId || draggingSprintId === targetId) return;
+    upd(prev => {
+      const sprints = [...prev.sprints];
+      const fromIdx = sprints.findIndex(s => s.id === draggingSprintId);
+      const toIdx = sprints.findIndex(s => s.id === targetId);
+      const [moved] = sprints.splice(fromIdx, 1);
+      sprints.splice(toIdx, 0, moved);
+      return { ...prev, sprints };
+    });
+    setDraggingSprintId(null); setOverSprintId(null);
+  }, [draggingSprintId, upd]);
+
   const handleDragStart = useCallback(fid=>setDraggingId(fid),[]);
   const handleDragEnd = useCallback(()=>{setDraggingId(null);setDropTarget(null);},[]);
   const handleDragOverCard = useCallback((sid,fid,pos)=>setDropTarget({sprintId:sid,featureId:fid,position:pos}),[]);
@@ -428,12 +462,13 @@ export default function App() {
       <div
         ref={boardRef}
         onMouseDown={onBoardMouseDown}
-        onMouseMove={onBoardMouseMove}
+        onMouseMove={e=>{onBoardMouseMove(e);onBoardMouseOverCard(e);}}
         onMouseUp={onBoardMouseUp}
         onMouseLeave={onBoardMouseUp}
-        style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16,cursor:"grab"}}>
+        style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16,cursor:"grab"}}
+        onMouseEnter={e=>{if(e.target===boardRef.current)boardRef.current.style.cursor="grab";}}>
         {filtered.sprints.map(s=>(
-          <SprintCol key={s.id} sprint={s} onUpdateFeature={updateFeature} onDeleteFeature={deleteFeature} onAddFeature={addFeature} onUpdateSprint={updateSprint} onDeleteSprint={deleteSprint} onDragStart={handleDragStart} onDragEnd={handleDragEnd} draggingId={draggingId} dropTarget={dropTarget} onDragOverCard={handleDragOverCard} onDragOverEmpty={handleDragOverEmpty} editable={editable}/>
+          <SprintCol key={s.id} sprint={s} onUpdateFeature={updateFeature} onDeleteFeature={deleteFeature} onAddFeature={addFeature} onUpdateSprint={updateSprint} onDeleteSprint={deleteSprint} onDragStart={handleDragStart} onDragEnd={handleDragEnd} draggingId={draggingId} dropTarget={dropTarget} onDragOverCard={handleDragOverCard} onDragOverEmpty={handleDragOverEmpty} editable={editable} onSprintDragStart={handleSprintDragStart} onSprintDragOver={handleSprintDragOver} onSprintDrop={handleSprintDrop} onSprintDragEnd={handleSprintDragEnd} isSprintDragging={draggingSprintId===s.id}/>
         ))}
       </div>
     </div>
