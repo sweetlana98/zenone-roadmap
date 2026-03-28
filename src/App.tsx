@@ -425,7 +425,7 @@ export default function App() {
         onMouseMove={onBoardMouseMove}
         onMouseUp={onBoardMouseUp}
         onMouseLeave={onBoardMouseUp}
-        style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16,cursor:"grab",userSelect:"none"}}>
+        style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16,cursor:"grab"}}>
         {filtered.sprints.map(s=>(
           <SprintCol key={s.id} sprint={s} onUpdateFeature={updateFeature} onDeleteFeature={deleteFeature} onAddFeature={addFeature} onUpdateSprint={updateSprint} onDeleteSprint={deleteSprint} onDragStart={handleDragStart} onDragEnd={handleDragEnd} draggingId={draggingId} dropTarget={dropTarget} onDragOverCard={handleDragOverCard} onDragOverEmpty={handleDragOverEmpty} editable={editable}/>
         ))}
