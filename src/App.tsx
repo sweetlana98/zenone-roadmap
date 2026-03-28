@@ -352,7 +352,27 @@ export default function App() {
   const deleteSprint = sid => upd(p=>({...p,sprints:p.sprints.filter(s=>s.id!==sid)}));
   const addSprint = () => upd(p=>({...p,sprints:[...p.sprints,{id:newId(),label:`Sprint ${58+p.sprints.length-3}`,dates:"Dates TBD",features:[]}]}));
 
-  const handleDragStart = useCallback(fid=>setDraggingId(fid),[]);
+  const boardRef = useRef(null);
+  const isPanning = useRef(false);
+  const panStart = useRef({x:0,y:0,scrollX:0,scrollY:0});
+
+  const onBoardMouseDown = e => {
+    if (e.target !== boardRef.current) return;
+    isPanning.current = true;
+    panStart.current = { x: e.clientX, y: e.clientY, scrollX: boardRef.current.scrollLeft, scrollY: window.scrollY };
+    boardRef.current.style.cursor = "grabbing";
+  };
+  const onBoardMouseMove = e => {
+    if (!isPanning.current) return;
+    const dx = e.clientX - panStart.current.x;
+    const dy = e.clientY - panStart.current.y;
+    boardRef.current.scrollLeft = panStart.current.scrollX - dx;
+    window.scrollTo(0, panStart.current.scrollY - dy);
+  };
+  const onBoardMouseUp = () => {
+    isPanning.current = false;
+    if (boardRef.current) boardRef.current.style.cursor = "grab";
+  };
   const handleDragEnd = useCallback(()=>{setDraggingId(null);setDropTarget(null);},[]);
   const handleDragOverCard = useCallback((sid,fid,pos)=>setDropTarget({sprintId:sid,featureId:fid,position:pos}),[]);
   const handleDragOverEmpty = useCallback(sid=>setDropTarget({sprintId:sid,featureId:null,position:"after"}),[]);
@@ -399,7 +419,13 @@ export default function App() {
       <div style={{fontSize:10,color:"#333",marginBottom:14}}>
         {editable?"Drag ⠿ to reposition · Click size to change · Click phase to advance · Click text to edit":filter==="all"?"View mode — click Edit to make changes":"View only"}
       </div>
-      <div style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16}}>
+      <div
+        ref={boardRef}
+        onMouseDown={onBoardMouseDown}
+        onMouseMove={onBoardMouseMove}
+        onMouseUp={onBoardMouseUp}
+        onMouseLeave={onBoardMouseUp}
+        style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16,cursor:"grab",userSelect:"none"}}>
         {filtered.sprints.map(s=>(
           <SprintCol key={s.id} sprint={s} onUpdateFeature={updateFeature} onDeleteFeature={deleteFeature} onAddFeature={addFeature} onUpdateSprint={updateSprint} onDeleteSprint={deleteSprint} onDragStart={handleDragStart} onDragEnd={handleDragEnd} draggingId={draggingId} dropTarget={dropTarget} onDragOverCard={handleDragOverCard} onDragOverEmpty={handleDragOverEmpty} editable={editable}/>
         ))}
