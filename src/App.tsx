@@ -367,28 +367,31 @@ export default function App() {
 
   const onBoardMouseDown = e => {
     if (e.target !== boardRef.current) return;
+    e.preventDefault();
     isPanning.current = true;
     panStart.current = { x: e.clientX, y: e.clientY, scrollX: boardRef.current.scrollLeft, scrollY: window.scrollY };
     boardRef.current.style.cursor = "grabbing";
+    boardRef.current.style.userSelect = "none";
+    document.body.style.userSelect = "none";
   };
   const onBoardMouseMove = e => {
     if (!isPanning.current) return;
+    e.preventDefault();
     const dx = e.clientX - panStart.current.x;
     const dy = e.clientY - panStart.current.y;
     boardRef.current.scrollLeft = panStart.current.scrollX - dx;
     window.scrollTo(0, panStart.current.scrollY - dy);
   };
-  const onBoardMouseUp = () => {
+  const onBoardMouseUp = e => {
+    if (!isPanning.current) return;
     isPanning.current = false;
-    if (boardRef.current) boardRef.current.style.cursor = "grab";
+    boardRef.current.style.userSelect = "";
+    document.body.style.userSelect = "";
+    if (boardRef.current) boardRef.current.style.cursor = e?.target === boardRef.current ? "grab" : "default";
   };
   const onBoardMouseOverCard = e => {
-    if (!boardRef.current) return;
-    if (e.target === boardRef.current) {
-      boardRef.current.style.cursor = isPanning.current ? "grabbing" : "grab";
-    } else {
-      boardRef.current.style.cursor = "default";
-    }
+    if (!boardRef.current || isPanning.current) return;
+    boardRef.current.style.cursor = e.target === boardRef.current ? "grab" : "default";
   };
   const [draggingSprintId, setDraggingSprintId] = useState(null);
   const [overSprintId, setOverSprintId] = useState(null);
