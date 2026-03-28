@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 
 const SUPABASE_URL = "https://fwktaxbgicooxmqleaho.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3a3RheGJnaWNvb3htcWxlYWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NTk3ODYsImV4cCI6MjA5MDEzNTc4Nn0._YNNkQn-jmvFziFAAWQbzxKEkpebQbYBfqg110WdDYo";
+const JIRA_BASE = "https://zenone.atlassian.net/browse";
 
 async function loadData() {
   try {
@@ -23,35 +24,7 @@ async function saveData(data) {
   } catch {}
 }
 
-const INIT_DATA = {
-  sprints: [
-    {
-      id: "s55", label: "Sprint 55", dates: "Feb 2–13",
-      features: [
-        { id: "f1", name: "Survey pop-up", size: "M", phases: { product: "done", design: "done", eng: "done" }, estNum: "3", estUnit: "days", note: "", owners: [], tasks: [{ id: "t1", name: "Data collection form (clinic type, # of Drs, goal)", owners: ["Pedro"] }, { id: "t2", name: "Select → done flow", owners: ["Pedro"] }] },
-        { id: "f2", name: "Help Center", size: "L", phases: { product: "done", design: "in-progress", eng: "not-started" }, estNum: "", estUnit: "days", note: "Eng picks up in Sprint 56", owners: [], tasks: [{ id: "t3", name: "Contents, rough layout, key features & anchors ready", owners: ["Design"] }, { id: "t4", name: "Put together with designer", owners: ["Design"] }] },
-        { id: "f3", name: "Admin changes", size: "XL", phases: { product: "in-progress", design: "not-started", eng: "not-started" }, estNum: "", estUnit: "days", note: "Design + Eng in Sprint 56", owners: [], tasks: [{ id: "t5", name: "Scope: Onboarding KPIs, Health Scores, Customer Segmentation", owners: [] }] }
-      ]
-    },
-    {
-      id: "s56", label: "Sprint 56", dates: "Feb 16–27",
-      features: [
-        { id: "f4", name: "HubSpot data sync", size: "M", phases: { product: "done", design: "done", eng: "done" }, estNum: "", estUnit: "days", note: "", owners: ["Kirill"], tasks: [{ id: "t6", name: "Integrate ZenOne with HubSpot", owners: ["Kirill"] }] },
-        { id: "f5", name: "Admin changes", size: "XL", phases: { product: "done", design: "done", eng: "in-progress" }, estNum: "1", estUnit: "weeks", note: "", owners: ["Kirill", "Pedro"], tasks: [{ id: "t7", name: "Customer Detail Page + list (ref: 1548)", owners: ["Kirill"] }, { id: "t8", name: "Alarms", owners: ["Kirill"] }, { id: "t9", name: "Stats: Onboarding KPIs, Health Scores", owners: ["Pedro"] }] },
-        { id: "f6", name: "Help Center", size: "L", phases: { product: "done", design: "done", eng: "in-progress" }, estNum: "1", estUnit: "weeks", note: "", owners: ["Pedro"], tasks: [{ id: "t12", name: "Building + Videos hookup", owners: ["Pedro"] }] },
-        { id: "f7", name: "Wizard rework", size: "M", phases: { product: "done", design: "done", eng: "in-progress" }, estNum: "", estUnit: "days", note: "", owners: [], tasks: [{ id: "t13", name: "Surface changes", owners: ["Pedro"] }, { id: "t14", name: "In-depth rework", owners: ["Kirill"] }] }
-      ]
-    },
-    {
-      id: "s57", label: "Sprint 57", dates: "Mar 1–10",
-      features: [
-        { id: "f8", name: "Vendor Portal", size: "XL", phases: { product: "done", design: "in-progress", eng: "not-started" }, estNum: "", estUnit: "days", note: "", owners: ["Tanya"], tasks: [{ id: "t15", name: "Improvements: shipping states, order minimum, multi-user", owners: ["Tanya"] }, { id: "t16", name: "Bug fixes: Stripe connection (ref: 2605)", owners: ["Tanya"] }] },
-        { id: "f9", name: "ACH + payment terms", size: "M", phases: { product: "in-progress", design: "not-started", eng: "not-started" }, estNum: "", estUnit: "days", note: "Design → TBD", owners: [], tasks: [{ id: "t19", name: "Add ACH, payment terms (net 30)", owners: [] }] },
-        { id: "f10", name: "Shopping cart + onboarding review", size: "XL", phases: { product: "in-progress", design: "not-started", eng: "not-started" }, estNum: "", estUnit: "days", note: "Design → TBD", owners: [], tasks: [{ id: "t22", name: "Simple vs Assisted onboarding — features, price points", owners: [] }] }
-      ]
-    }
-  ]
-};
+const INIT_DATA = { sprints: [] };
 
 const SIZE_ORDER = ["XL","L","M","S"];
 const SIZE_STYLES = { XL:{bg:"#3C3489",text:"#fff",border:"#534AB7"}, L:{bg:"#085041",text:"#fff",border:"#0F6E56"}, M:{bg:"#633806",text:"#fff",border:"#854F0B"}, S:{bg:"#791F1F",text:"#fff",border:"#A32D2D"} };
@@ -99,7 +72,7 @@ function SizeBadge({ size, onChange, editable }) {
   );
 }
 
-function InlineEdit({ value, onChange, style={}, placeholder="Edit…", multiline=false, editable=true }) {
+function InlineEdit({ value, onChange, style={}, placeholder="Edit…", editable=true }) {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(value);
   useEffect(() => setVal(value), [value]);
@@ -109,10 +82,7 @@ function InlineEdit({ value, onChange, style={}, placeholder="Edit…", multilin
       {value || <span style={{opacity:0.3}}>{editable?placeholder:""}</span>}
     </span>
   );
-  const sh = {background:"#2a2a2a",border:"0.5px solid #555",borderRadius:4,color:"#f0f0f0",fontSize:"inherit",fontFamily:"inherit",padding:"2px 6px",outline:"none",width:"100%",boxSizing:"border-box",...style};
-  return multiline
-    ? <textarea autoFocus value={val} rows={2} onChange={e=>setVal(e.target.value)} onBlur={commit} style={{...sh,resize:"none"}} onClick={e=>e.stopPropagation()}/>
-    : <input autoFocus value={val} onChange={e=>setVal(e.target.value)} onBlur={commit} onKeyDown={e=>{if(e.key==="Enter")commit();if(e.key==="Escape")setEditing(false);}} style={sh} onClick={e=>e.stopPropagation()}/>;
+  return <input autoFocus value={val} onChange={e=>setVal(e.target.value)} onBlur={commit} onKeyDown={e=>{if(e.key==="Enter")commit();if(e.key==="Escape")setEditing(false);}} style={{background:"#2a2a2a",border:"0.5px solid #555",borderRadius:4,color:"#f0f0f0",fontSize:"inherit",fontFamily:"inherit",padding:"2px 6px",outline:"none",boxSizing:"border-box",...style}} onClick={e=>e.stopPropagation()}/>;
 }
 
 function OwnersPicker({ owners, onChange, editable }) {
@@ -174,21 +144,45 @@ function OwnersPicker({ owners, onChange, editable }) {
   );
 }
 
+function JiraTag({ ticketId, onChange, editable }) {
+  const [editing, setEditing] = useState(false);
+  const [val, setVal] = useState(ticketId || "");
+  useEffect(() => setVal(ticketId || ""), [ticketId]);
+  const commit = () => { setEditing(false); onChange(val.trim().toUpperCase()); };
+
+  if (editing) return (
+    <input autoFocus value={val} onChange={e=>setVal(e.target.value)} onBlur={commit}
+      onKeyDown={e=>{if(e.key==="Enter")commit();if(e.key==="Escape"){setEditing(false);setVal(ticketId||"");}}}
+      placeholder="ZEN-123" onClick={e=>e.stopPropagation()}
+      style={{width:80,background:"#2a2a2a",border:"0.5px solid #534AB7",borderRadius:4,color:"#c084fc",fontSize:10,padding:"1px 5px",outline:"none",fontFamily:"system-ui,sans-serif"}}/>
+  );
+  if (ticketId) return (
+    <span style={{display:"inline-flex",alignItems:"center",gap:3,flexShrink:0}}>
+      <a href={`${JIRA_BASE}/${ticketId}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()}
+        style={{background:"#2a1a4a",color:"#c084fc",borderRadius:4,padding:"1px 6px",fontSize:10,fontWeight:500,border:"0.5px solid #534AB7",textDecoration:"none",whiteSpace:"nowrap"}}>
+        {ticketId} ↗
+      </a>
+      {editable && <span onClick={e=>{e.stopPropagation();onChange("");}} style={{color:"#555",fontSize:10,cursor:"pointer"}}>✕</span>}
+    </span>
+  );
+  if (!editable) return null;
+  return <span onClick={e=>{e.stopPropagation();setEditing(true);}} style={{color:"#444",fontSize:10,cursor:"pointer",whiteSpace:"nowrap",padding:"1px 4px",borderRadius:4,border:"0.5px dashed #333"}}>+ Jira</span>;
+}
+
 function DropIndicator() { return <div style={{height:3,background:"#4ade80",borderRadius:2,margin:"2px 0"}}/>; }
 
 function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDragging, onDragOverCard, dropPosition, editable }) {
   const [collapsed, setCollapsed] = useState(false);
   const [confirmDel, setConfirmDel] = useState(false);
   const [confirmTask, setConfirmTask] = useState(null);
+  const [dragging, setDragging] = useState(false);
   const cardRef = useRef();
   const delRef = useRef();
   useClickOutside(delRef, () => setConfirmDel(false));
 
-  const [dragging, setDragging] = useState(false);
-
   const cyclePhase = key => { const o=["not-started","in-progress","done"]; onUpdate(feature.id,{phases:{...feature.phases,[key]:o[(o.indexOf(feature.phases[key])+1)%o.length]}}); };
   const updateTask = (tid,ch) => onUpdate(feature.id,{tasks:feature.tasks.map(t=>t.id===tid?{...t,...ch}:t)});
-  const addTask = () => onUpdate(feature.id,{tasks:[...feature.tasks,{id:newId(),name:"New task",owners:[]}]});
+  const addTask = () => onUpdate(feature.id,{tasks:[...feature.tasks,{id:newId(),name:"",owners:[],done:false,jiraId:""}]});
   const deleteTask = tid => onUpdate(feature.id,{tasks:feature.tasks.filter(t=>t.id!==tid)});
   const onDragOv = e => { if(!editable)return; e.preventDefault();e.stopPropagation(); const r=cardRef.current.getBoundingClientRect(); onDragOverCard(feature.id,e.clientY<r.top+r.height/2?"before":"after"); };
   const bc = feature.phases.eng==="done"?"#166534":feature.phases.eng==="in-progress"?"#854d0e":"#2d2d2d";
@@ -196,17 +190,13 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
   return (
     <div ref={cardRef} onDragOver={onDragOv}>
       {dropPosition==="before"&&<DropIndicator/>}
-      <div draggable={editable&&dragging} 
+      <div draggable={editable&&dragging}
         onDragStart={editable&&dragging?e=>{e.dataTransfer.effectAllowed="move";e.stopPropagation();onDragStart(feature.id);}:e=>e.preventDefault()}
-        onDragEnd={editable?e=>{onDragEnd();setDragging(false);}:undefined}
+        onDragEnd={editable?()=>{onDragEnd();setDragging(false);}:undefined}
         style={{background:"#1a1a1a",border:`0.5px solid ${bc}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:"0 1px 3px rgba(0,0,0,.4)"}}>
         <div style={{background:"#1f1f1f",padding:"9px 10px"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
-            {editable&&<span 
-              onMouseDown={e=>{e.stopPropagation();setDragging(true);}} 
-              onMouseUp={()=>setDragging(false)}
-              onMouseLeave={()=>setDragging(false)}
-              style={{color:"#444",fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
+            {editable&&<span onMouseDown={e=>{e.stopPropagation();setDragging(true);}} onMouseUp={()=>setDragging(false)} onMouseLeave={()=>setDragging(false)} style={{color:"#444",fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
             <SizeBadge size={feature.size} onChange={v=>onUpdate(feature.id,{size:v})} editable={editable}/>
             <InlineEdit value={feature.name} onChange={v=>onUpdate(feature.id,{name:v})} editable={editable} placeholder="Feature name" style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,color:"#f0f0f0",lineHeight:1.4}}/>
             <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:2}}>
@@ -236,20 +226,33 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
             })}
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:3,marginBottom:6}}>
-            {feature.tasks.map(task=>(
-              <div key={task.id} style={{display:"flex",alignItems:"center",gap:6,background:"#242424",borderRadius:6,padding:"5px 8px",border:"0.5px solid #2d2d2d",position:"relative"}}>
-                <InlineEdit value={task.name} onChange={v=>updateTask(task.id,{name:v})} editable={editable} placeholder="Task" multiline style={{flex:1,fontSize:11,color:"#c0c0c0",lineHeight:1.4}}/>
-                <OwnersPicker owners={task.owners||[]} onChange={v=>updateTask(task.id,{owners:v})} editable={editable}/>
-                {editable&&<div style={{position:"relative",flexShrink:0}}>
-                  <span onClick={()=>setConfirmTask(task.id)} style={{fontSize:10,color:"#333",cursor:"pointer"}}>✕</span>
-                  {confirmTask===task.id&&<div style={{position:"absolute",top:0,right:18,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:110,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
-                    <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete task?</span>
-                    <div style={{display:"flex",gap:6}}>
-                      <button onClick={()=>{deleteTask(task.id);setConfirmTask(null);}} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
-                      <button onClick={()=>setConfirmTask(null)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
-                    </div>
+            {(feature.tasks||[]).map(task=>(
+              <div key={task.id} style={{display:"flex",alignItems:"flex-start",gap:6,background:"#242424",borderRadius:6,padding:"5px 8px",border:`0.5px solid ${task.done?"#166534":"#2d2d2d"}`}}>
+                <div onClick={()=>updateTask(task.id,{done:!task.done})} style={{width:14,height:14,borderRadius:3,border:`0.5px solid ${task.done?"#166534":"#444"}`,background:task.done?"#1a3a2a":"transparent",flexShrink:0,marginTop:3,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  {task.done&&<span style={{color:"#4ade80",fontSize:10,lineHeight:1}}>✓</span>}
+                </div>
+                {editable&&!task.done ? (
+                  <textarea value={task.name} onChange={e=>{updateTask(task.id,{name:e.target.value});e.target.style.height="auto";e.target.style.height=e.target.scrollHeight+"px";}}
+                    onFocus={e=>{e.target.style.height="auto";e.target.style.height=e.target.scrollHeight+"px";}}
+                    placeholder="Task description" rows={1}
+                    style={{flex:1,fontSize:11,color:"#c0c0c0",lineHeight:1.5,background:"transparent",border:"none",outline:"none",resize:"none",overflow:"hidden",minHeight:18,fontFamily:"system-ui,sans-serif",padding:0}}/>
+                ) : (
+                  <span style={{flex:1,fontSize:11,color:task.done?"#4b5563":"#c0c0c0",lineHeight:1.5,textDecoration:task.done?"line-through":"none",opacity:task.done?0.6:1}}>{task.name||<span style={{opacity:.3}}>Task description</span>}</span>
+                )}
+                <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:1}}>
+                  <JiraTag ticketId={task.jiraId} onChange={v=>updateTask(task.id,{jiraId:v})} editable={editable}/>
+                  <OwnersPicker owners={task.owners||[]} onChange={v=>updateTask(task.id,{owners:v})} editable={editable}/>
+                  {editable&&<div style={{position:"relative",flexShrink:0}}>
+                    <span onClick={()=>setConfirmTask(task.id)} style={{fontSize:10,color:"#333",cursor:"pointer"}}>✕</span>
+                    {confirmTask===task.id&&<div style={{position:"absolute",top:0,right:18,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:110,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
+                      <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete task?</span>
+                      <div style={{display:"flex",gap:6}}>
+                        <button onClick={()=>{deleteTask(task.id);setConfirmTask(null);}} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
+                        <button onClick={()=>setConfirmTask(null)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
+                      </div>
+                    </div>}
                   </div>}
-                </div>}
+                </div>
               </div>
             ))}
             {editable&&<button onClick={addTask} style={{background:"transparent",border:"0.5px dashed #333",borderRadius:6,color:"#555",fontSize:10,padding:"4px 8px",cursor:"pointer",textAlign:"left"}}>+ Add task</button>}
@@ -257,12 +260,12 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
           <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap",paddingTop:4,borderTop:"0.5px solid #222"}}>
             {editable ? <>
               <span style={{fontSize:10,color:"#555"}}>EST:</span>
-              <input type="number" min="0" value={feature.estNum} onChange={e=>onUpdate(feature.id,{estNum:e.target.value})} placeholder="–" style={{width:36,background:"#2a2a2a",border:"0.5px solid #333",borderRadius:4,color:"#9ca3af",fontSize:10,padding:"2px 4px",outline:"none",textAlign:"center"}}/>
-              <select value={feature.estUnit} onChange={e=>onUpdate(feature.id,{estUnit:e.target.value})} style={{background:"#2a2a2a",border:"0.5px solid #333",borderRadius:4,color:"#6b7280",fontSize:10,padding:"2px 4px",outline:"none",cursor:"pointer"}}>
+              <input type="number" min="0" value={feature.estNum||""} onChange={e=>onUpdate(feature.id,{estNum:e.target.value})} placeholder="–" style={{width:36,background:"#2a2a2a",border:"0.5px solid #333",borderRadius:4,color:"#9ca3af",fontSize:10,padding:"2px 4px",outline:"none",textAlign:"center"}}/>
+              <select value={feature.estUnit||"days"} onChange={e=>onUpdate(feature.id,{estUnit:e.target.value})} style={{background:"#2a2a2a",border:"0.5px solid #333",borderRadius:4,color:"#6b7280",fontSize:10,padding:"2px 4px",outline:"none",cursor:"pointer"}}>
                 <option value="days">day(s)</option>
                 <option value="weeks">week(s)</option>
               </select>
-              <InlineEdit value={feature.note} onChange={v=>onUpdate(feature.id,{note:v})} editable placeholder="+ add note" style={{fontSize:10,color:"#4b5563",fontStyle:"italic"}}/>
+              <InlineEdit value={feature.note||""} onChange={v=>onUpdate(feature.id,{note:v})} editable placeholder="+ add note" style={{fontSize:10,color:"#4b5563",fontStyle:"italic"}}/>
             </> : <>
               {feature.estNum&&<span style={{fontSize:10,color:"#6b7280"}}>EST: {feature.estNum} {feature.estUnit}</span>}
               {feature.note&&<span style={{fontSize:10,color:"#4b5563",fontStyle:"italic"}}>{feature.note}</span>}
@@ -303,7 +306,7 @@ function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onU
         </div>
       </div>
       {emptyTarget&&<DropIndicator/>}
-      {sprint.features.map(f=>{
+      {(sprint.features||[]).map(f=>{
         const pos=editable&&dropTarget?.sprintId===sprint.id&&dropTarget?.featureId===f.id?dropTarget.position:null;
         return <FeatureCard key={f.id} feature={f} onUpdate={onUpdateFeature} onDelete={onDeleteFeature} onDragStart={onDragStart} onDragEnd={onDragEnd} isDragging={draggingId===f.id} onDragOverCard={(fid,p)=>onDragOverCard(sprint.id,fid,p)} dropPosition={pos} editable={editable}/>;
       })}
@@ -341,6 +344,7 @@ export default function App() {
   }, []);
 
   const upd = useCallback(fn => setData(prev => { const next = fn(prev); scheduleSave(next); return next; }), [scheduleSave]);
+
   const updateFeature = (fid,ch) => upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.map(f=>f.id===fid?{...f,...ch}:f)}))}));
   const deleteFeature = fid => upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.filter(f=>f.id!==fid)}))}));
   const addFeature = sid => upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,features:[...s.features,{id:newId(),name:"New feature",size:"M",phases:{product:"not-started",design:"not-started",eng:"not-started"},estNum:"",estUnit:"days",note:"",owners:[],tasks:[]}]}:s)}));
