@@ -227,7 +227,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:3,marginBottom:6}}>
             {(feature.tasks||[]).map(task=>(
-              <div key={task.id} style={{display:"flex",alignItems:"flex-start",gap:6,background:"#242424",borderRadius:6,padding:"5px 8px",border:`0.5px solid ${task.done?"#166534":"#2d2d2d"}`}}>
+              <div key={task.id} style={{display:"flex",alignItems:"flex-start",gap:6,background:"#242424",borderRadius:6,padding:"5px 8px",border:`0.5px solid ${task.done?"#166534":"#2d2d2d"}`,textAlign:"left"}}>
                 <div onClick={()=>updateTask(task.id,{done:!task.done})} style={{width:14,height:14,borderRadius:3,border:`0.5px solid ${task.done?"#166534":"#444"}`,background:task.done?"#1a3a2a":"transparent",flexShrink:0,marginTop:3,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
                   {task.done&&<span style={{color:"#4ade80",fontSize:10,lineHeight:1}}>✓</span>}
                 </div>
@@ -237,7 +237,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
                     placeholder="Task description" rows={1}
                     style={{flex:1,fontSize:11,color:"#c0c0c0",lineHeight:1.5,background:"transparent",border:"none",outline:"none",resize:"none",overflow:"hidden",minHeight:18,fontFamily:"system-ui,sans-serif",padding:0}}/>
                 ) : (
-                  <span style={{flex:1,fontSize:11,color:task.done?"#4b5563":"#c0c0c0",lineHeight:1.5,textDecoration:task.done?"line-through":"none",opacity:task.done?0.6:1}}>{task.name||<span style={{opacity:.3}}>Task description</span>}</span>
+                  <span style={{flex:1,fontSize:11,color:task.done?"#4b5563":"#c0c0c0",lineHeight:1.5,textDecoration:task.done?"line-through":"none",opacity:task.done?0.6:1,textAlign:"left"}}>{task.name||<span style={{opacity:.3}}>Task description</span>}</span>
                 )}
                 <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:1}}>
                   <JiraTag ticketId={task.jiraId} onChange={v=>updateTask(task.id,{jiraId:v})} editable={editable}/>
@@ -278,7 +278,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
   );
 }
 
-function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onUpdateSprint, onDeleteSprint, onDragStart, onDragEnd, draggingId, dropTarget, onDragOverCard, onDragOverEmpty, editable, onSprintDragStart, onSprintDragOver, onSprintDrop, onSprintDragEnd, isSprintDragging }) {
+function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onUpdateSprint, onDeleteSprint, onDragStart, onDragEnd, draggingId, dropTarget, onDragOverCard, onDragOverEmpty, editable, onSprintDragStart, onSprintDragOver, onSprintDrop, onSprintDragEnd, isSprintDragging, colWidth }) {
   const emptyTarget = editable&&dropTarget?.sprintId===sprint.id&&!dropTarget?.featureId;
   const [confirmDel, setConfirmDel] = useState(false);
   const [sprintDragging, setSprintDragging] = useState(false);
@@ -291,7 +291,7 @@ function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onU
       onDragEnd={editable?()=>{setSprintDragging(false);onSprintDragEnd();}:undefined}
       onDragOver={e=>{e.preventDefault();if(editable){if(!sprint.features.length)onDragOverEmpty(sprint.id);onSprintDragOver(sprint.id);}}}
       onDrop={e=>{e.preventDefault();if(editable)onSprintDrop(sprint.id);}}
-      style={{flexShrink:0,width:280,background:"#141414",borderRadius:12,padding:12,border:`0.5px solid ${isSprintDragging?"#534AB7":"#2a2a2a"}`,boxSizing:"border-box",opacity:isSprintDragging?0.4:1,transition:"opacity .15s"}}>
+      style={{flexShrink:0,width:colWidth,background:"#141414",borderRadius:12,padding:12,border:`0.5px solid ${isSprintDragging?"#534AB7":"#2a2a2a"}`,boxSizing:"border-box",opacity:isSprintDragging?0.4:1,transition:"opacity .15s,width .1s"}}>
       <div style={{marginBottom:12}}>
                   <div style={{display:"flex",alignItems:"flex-start",gap:6}}>
             {editable&&<span onMouseDown={e=>{e.stopPropagation();setSprintDragging(true);}} onMouseUp={()=>setSprintDragging(false)} onMouseLeave={()=>setSprintDragging(false)} style={{color:"#333",fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
@@ -387,12 +387,13 @@ export default function App() {
     isPanning.current = false;
     boardRef.current.style.userSelect = "";
     document.body.style.userSelect = "";
-    if (boardRef.current) boardRef.current.style.cursor = e?.target === boardRef.current ? "grab" : "default";
+    if (boardRef.current) boardRef.current.style.cursor = (e && e.target === boardRef.current) ? "grab" : "default";
   };
   const onBoardMouseOverCard = e => {
     if (!boardRef.current || isPanning.current) return;
     boardRef.current.style.cursor = e.target === boardRef.current ? "grab" : "default";
   };
+  const [colWidth, setColWidth] = useState(280);
   const [draggingSprintId, setDraggingSprintId] = useState(null);
   const [overSprintId, setOverSprintId] = useState(null);
 
@@ -457,6 +458,11 @@ export default function App() {
           <div style={{display:"flex",gap:4}}>{[["all","All"],["xl-l","Boulders"],["m-s","Pebbles"]].map(([v,l])=>fBtn(v,l))}</div>
           {filter==="all"&&<button onClick={()=>setEditMode(m=>!m)} style={{padding:"4px 14px",borderRadius:20,fontSize:11,cursor:"pointer",border:`0.5px solid ${editMode?"#4ade80":"#2a2a2a"}`,background:editMode?"#1a3a2a":"transparent",color:editMode?"#4ade80":"#555",transition:"all .2s"}}>{editMode?"✓ Editing":"Edit"}</button>}
           {editable&&<button onClick={addSprint} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:"0.5px solid #2a2a2a",background:"transparent",color:"#555"}}>+ Sprint</button>}
+          <div style={{display:"flex",alignItems:"center",gap:6,marginLeft:4}}>
+            <span style={{fontSize:10,color:"#444",whiteSpace:"nowrap"}}>⟷</span>
+            <input type="range" min={220} max={500} value={colWidth} onChange={e=>setColWidth(Number(e.target.value))}
+              style={{width:70,accentColor:"#534AB7",cursor:"pointer"}}/>
+          </div>
         </div>
       </div>
       <div style={{fontSize:10,color:"#333",marginBottom:14}}>
@@ -471,7 +477,7 @@ export default function App() {
         style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16,cursor:"grab"}}
         onMouseEnter={e=>{if(e.target===boardRef.current)boardRef.current.style.cursor="grab";}}>
         {filtered.sprints.map(s=>(
-          <SprintCol key={s.id} sprint={s} onUpdateFeature={updateFeature} onDeleteFeature={deleteFeature} onAddFeature={addFeature} onUpdateSprint={updateSprint} onDeleteSprint={deleteSprint} onDragStart={handleDragStart} onDragEnd={handleDragEnd} draggingId={draggingId} dropTarget={dropTarget} onDragOverCard={handleDragOverCard} onDragOverEmpty={handleDragOverEmpty} editable={editable} onSprintDragStart={handleSprintDragStart} onSprintDragOver={handleSprintDragOver} onSprintDrop={handleSprintDrop} onSprintDragEnd={handleSprintDragEnd} isSprintDragging={draggingSprintId===s.id}/>
+          <SprintCol key={s.id} sprint={s} onUpdateFeature={updateFeature} onDeleteFeature={deleteFeature} onAddFeature={addFeature} onUpdateSprint={updateSprint} onDeleteSprint={deleteSprint} onDragStart={handleDragStart} onDragEnd={handleDragEnd} draggingId={draggingId} dropTarget={dropTarget} onDragOverCard={handleDragOverCard} onDragOverEmpty={handleDragOverEmpty} editable={editable} onSprintDragStart={handleSprintDragStart} onSprintDragOver={handleSprintDragOver} onSprintDrop={handleSprintDrop} onSprintDragEnd={handleSprintDragEnd} isSprintDragging={draggingSprintId===s.id} colWidth={colWidth}/>
         ))}
       </div>
     </div>
