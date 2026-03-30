@@ -335,8 +335,22 @@ export default function App() {
 
   useEffect(() => {
     loadData().then(remote => {
-      if (remote && remote.sprints && remote.sprints.length > 0) setData(remote);
-      else setData(INIT_DATA);
+      if (remote && remote.sprints && remote.sprints.length > 0) {
+        // Fix any duplicate IDs on load
+        const seenIds = new Set();
+        const fixed = {
+          ...remote,
+          sprints: remote.sprints.map(s => ({
+            ...s,
+            features: s.features.map(f => {
+              if (seenIds.has(f.id)) return { ...f, id: newId() };
+              seenIds.add(f.id);
+              return f;
+            })
+          }))
+        };
+        setData(fixed);
+      } else setData(INIT_DATA);
     }).catch(() => setData(INIT_DATA));
   }, []);
 
