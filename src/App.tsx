@@ -152,7 +152,15 @@ function JiraTag({ ticketId, onChange, editable }) {
 function DropIndicator() { return <div style={{height:3,background:"#4ade80",borderRadius:2,margin:"2px 0"}}/>; }
 
 function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDragging, onDragOverCard, dropPosition, editable, isPublic }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const storageKey = `collapsed_${feature.id}`;
+  const [collapsed, setCollapsed] = useState(() => {
+    try { return localStorage.getItem(storageKey) === "true"; } catch { return false; }
+  });
+  const toggleCollapsed = () => {
+    const next = !collapsed;
+    setCollapsed(next);
+    try { localStorage.setItem(storageKey, String(next)); } catch {}
+  };
   const [confirmDel, setConfirmDel] = useState(false);
   const [confirmTask, setConfirmTask] = useState(null);
   const [dragging, setDragging] = useState(false);
@@ -180,7 +188,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
             <SizeBadge size={feature.size} onChange={v=>onUpdate(feature.id,{size:v})} editable={editable}/>
             <InlineEdit value={feature.name} onChange={v=>onUpdate(feature.id,{name:v})} editable={editable} placeholder="Feature name" style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,color:"#f0f0f0",lineHeight:1.4}}/>
             <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:2}}>
-              <span onClick={()=>setCollapsed(c=>!c)} style={{fontSize:10,color:"#555",cursor:"pointer",padding:"0 2px"}}>{collapsed?"▸":"▾"}</span>
+              <span onClick={()=>toggleCollapsed()} style={{fontSize:10,color:"#555",cursor:"pointer",padding:"0 2px"}}>{collapsed?"▸":"▾"}</span>
               {editable&&<div ref={delRef} style={{position:"relative"}}>
                 <span onClick={()=>setConfirmDel(true)} style={{fontSize:10,color:"#444",cursor:"pointer",padding:"0 2px"}}>✕</span>
                 {confirmDel&&<div style={{position:"absolute",top:0,right:24,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:110,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
