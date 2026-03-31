@@ -336,16 +336,19 @@ export default function App() {
   useEffect(() => {
     loadData().then(remote => {
       if (remote && remote.sprints && remote.sprints.length > 0) {
-        // Fix any duplicate IDs on load
         const seenIds = new Set();
         const fixed = {
           ...remote,
           sprints: remote.sprints.map(s => ({
             ...s,
             features: s.features.map(f => {
-              if (seenIds.has(f.id)) return { ...f, id: newId() };
-              seenIds.add(f.id);
-              return f;
+              const fixedFeature = seenIds.has(f.id) ? { ...f, id: newId() } : f;
+              seenIds.add(fixedFeature.id);
+              const fixedTasks = (fixedFeature.tasks || []).map(t => {
+                if (seenIds.has(t.id)) { const newT = { ...t, id: newId() }; seenIds.add(newT.id); return newT; }
+                seenIds.add(t.id); return t;
+              });
+              return { ...fixedFeature, tasks: fixedTasks };
             })
           }))
         };
