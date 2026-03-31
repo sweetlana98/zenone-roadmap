@@ -186,7 +186,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
             {editable&&<span onMouseDown={e=>{e.stopPropagation();setDragging(true);}} onMouseUp={()=>setDragging(false)} onMouseLeave={()=>setDragging(false)} style={{color:"#444",fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
             <SizeBadge size={feature.size} onChange={v=>onUpdate(feature.id,{size:v})} editable={editable}/>
-            <InlineEdit value={feature.name} onChange={v=>onUpdate(feature.id,{name:v})} editable={editable} placeholder="Feature name" style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,color:"#f0f0f0",lineHeight:1.4}}/>
+            <InlineEdit value={feature.name} onChange={v=>onUpdate(feature.id,{name:v})} editable={editable} placeholder="Feature name" style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,color:"#f0f0f0",lineHeight:1.4,wordBreak:"break-word",whiteSpace:"normal"}}/>
             <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:2}}>
               <span onClick={()=>toggleCollapsed()} style={{fontSize:10,color:"#555",cursor:"pointer",padding:"0 2px"}}>{collapsed?"▸":"▾"}</span>
               {editable&&<div ref={delRef} style={{position:"relative"}}>
@@ -225,7 +225,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
                     placeholder="Task description" rows={1}
                     style={{flex:1,fontSize:11,color:"#c0c0c0",lineHeight:1.5,background:"transparent",border:"none",outline:"none",resize:"none",overflow:"hidden",minHeight:18,fontFamily:"system-ui,sans-serif",padding:0,textAlign:"left"}}/>
                 ):(
-                  <span style={{flex:1,fontSize:11,color:task.done?"#4b5563":"#c0c0c0",lineHeight:1.5,textDecoration:task.done?"line-through":"none",opacity:task.done?0.6:1,textAlign:"left"}}>{task.name||<span style={{opacity:.3}}>Task description</span>}</span>
+                  <span style={{flex:1,fontSize:11,color:task.done?"#4b5563":"#c0c0c0",lineHeight:1.5,textDecoration:task.done?"line-through":"none",opacity:task.done?0.6:1,textAlign:"left",wordBreak:"break-word",whiteSpace:"normal"}}>{task.name||<span style={{opacity:.3}}>Task description</span>}</span>
                 )}
                 <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:1}}>
                   <JiraTag ticketId={task.jiraId} onChange={v=>updateTask(task.id,{jiraId:v})} editable={editable}/>
