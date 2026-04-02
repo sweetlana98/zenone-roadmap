@@ -276,7 +276,7 @@ function LabelBar({ labels, onAdd, onUpdate, onDelete, editable, darkMode, T }) 
               </div>
             )}
             {!editable && <span style={{width:10,height:10,borderRadius:"50%",background:lc.bg,display:"inline-block",flexShrink:0}}/>}
-            <InlineEdit value={l.name} onChange={v=>onUpdate(l.id,{name:v})} editable={editable}
+            <InlineEdit key={l.id} value={l.name} onChange={v=>onUpdate(l.id,{name:v})} editable={editable}
               style={{fontSize:11,fontWeight:500,color:darkMode?"#fff":lc.bg,minWidth:30,maxWidth:120}} T={T}/>
             {editable && (
               <span onClick={()=>setConfirmDel(confirmDel===l.id?null:l.id)} style={{fontSize:10,color:darkMode?"rgba(255,255,255,0.5)":lc.bg,cursor:"pointer",marginLeft:2,opacity:.7}}>✕</span>
