@@ -44,14 +44,22 @@ let OWNER_COLORS = {
 };
 
 const LABEL_COLORS = [
-  { id:"green",  bg:"#16a34a", light:"#dcfce7", border:"#86efac", text:"#fff" },
-  { id:"blue",   bg:"#2563eb", light:"#dbeafe", border:"#93c5fd", text:"#fff" },
-  { id:"purple", bg:"#7c3aed", light:"#ede9fe", border:"#c4b5fd", text:"#fff" },
-  { id:"amber",  bg:"#d97706", light:"#fef3c7", border:"#fcd34d", text:"#fff" },
-  { id:"red",    bg:"#dc2626", light:"#fee2e2", border:"#fca5a5", text:"#fff" },
-  { id:"pink",   bg:"#db2777", light:"#fce7f3", border:"#f9a8d4", text:"#fff" },
-  { id:"teal",   bg:"#0d9488", light:"#ccfbf1", border:"#5eead4", text:"#fff" },
-  { id:"orange", bg:"#ea580c", light:"#ffedd5", border:"#fdba74", text:"#fff" },
+  { id:"green",    bg:"#4a7c59", light:"#d4ead9", border:"#91c4a0", muted:"rgba(74,124,89,0.18)"  },
+  { id:"blue",     bg:"#3d6fa8", light:"#d0e4f7", border:"#8ab8e8", muted:"rgba(61,111,168,0.18)" },
+  { id:"purple",   bg:"#7059a8", light:"#e5dff7", border:"#b5a8e0", muted:"rgba(112,89,168,0.18)" },
+  { id:"amber",    bg:"#a07830", light:"#f5e8c8", border:"#d4b878", muted:"rgba(160,120,48,0.18)" },
+  { id:"red",      bg:"#a05050", light:"#f5d8d8", border:"#d49090", muted:"rgba(160,80,80,0.18)"  },
+  { id:"pink",     bg:"#a0507a", light:"#f5d8ea", border:"#d490b8", muted:"rgba(160,80,122,0.18)" },
+  { id:"teal",     bg:"#3a8a80", light:"#c8ecea", border:"#80ccc8", muted:"rgba(58,138,128,0.18)" },
+  { id:"orange",   bg:"#a06038", light:"#f5e0cc", border:"#d4a880", muted:"rgba(160,96,56,0.18)"  },
+  { id:"slate",    bg:"#506880", light:"#d8e4f0", border:"#90aac8", muted:"rgba(80,104,128,0.18)" },
+  { id:"rose",     bg:"#a05868", light:"#f5d8de", border:"#d498a8", muted:"rgba(160,88,104,0.18)" },
+  { id:"indigo",   bg:"#4858a8", light:"#d8dcf5", border:"#98a8e0", muted:"rgba(72,88,168,0.18)"  },
+  { id:"lime",     bg:"#5a8038", light:"#ddeec8", border:"#a0cc80", muted:"rgba(90,128,56,0.18)"  },
+  { id:"cyan",     bg:"#2a7890", light:"#c8e8f0", border:"#70bcd0", muted:"rgba(42,120,144,0.18)" },
+  { id:"fuchsia",  bg:"#885098", light:"#f0d8f5", border:"#cc90e0", muted:"rgba(136,80,152,0.18)" },
+  { id:"brown",    bg:"#7a5040", light:"#ead8d0", border:"#c0988a", muted:"rgba(122,80,64,0.18)"  },
+  { id:"stone",    bg:"#6a6458", light:"#e5e2da", border:"#b0a898", muted:"rgba(106,100,88,0.18)" },
 ];
 
 const STICKY_COLORS = ["#fef08a","#86efac","#93c5fd","#f9a8d4","#fdba74","#c4b5fd"];
@@ -394,17 +402,25 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
   const onDragOv = e => { if(!editable)return; e.preventDefault(); e.stopPropagation(); const r=cardRef.current.getBoundingClientRect(); onDragOverCard(feature.id,e.clientY<r.top+r.height/2?"before":"after"); };
   const bc = feature.phases.eng==="done"?"#166534":feature.phases.eng==="in-progress"?"#854d0e":T.border;
 
+  // Derive label color from any task that has a label (first one wins for the card header)
+  const cardLabelId = feature.labelId || null;
+  const cardLabel = labels.find(l => l.id === cardLabelId);
+  const cardLc = cardLabel ? LABEL_COLORS.find(c => c.id === cardLabel.colorId) || LABEL_COLORS[0] : null;
+  const headerBg = cardLc ? (darkMode ? `rgba(${parseInt(cardLc.bg.slice(1,3),16)},${parseInt(cardLc.bg.slice(3,5),16)},${parseInt(cardLc.bg.slice(5,7),16)},0.22)` : cardLc.light) : T.bg4;
+  const headerBorder = cardLc ? cardLc.bg : bc;
+
   return (
     <div ref={cardRef} onDragOver={onDragOv}>
       {dropPosition==="before" && <DropIndicator/>}
       <div draggable={editable&&dragging}
         onDragStart={editable&&dragging?e=>{ e.dataTransfer.effectAllowed="move"; e.stopPropagation(); onDragStart(feature.id); }:e=>e.preventDefault()}
         onDragEnd={editable?()=>{ onDragEnd(); setDragging(false); }:undefined}
-        style={{background:T.bg3,border:`0.5px solid ${bc}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:darkMode?"0 1px 3px rgba(0,0,0,.4)":"0 1px 4px rgba(0,0,0,.08)"}}>
-        <div style={{background:T.bg4,padding:"9px 10px"}}>
+        style={{background:T.bg3,border:`0.5px solid ${headerBorder}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:darkMode?"0 1px 3px rgba(0,0,0,.4)":"0 1px 4px rgba(0,0,0,.08)"}}>
+        <div style={{background:headerBg,padding:"9px 10px"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
             {editable && <span onMouseDown={e=>{ e.stopPropagation(); setDragging(true); }} onMouseUp={()=>setDragging(false)} onMouseLeave={()=>setDragging(false)} style={{color:T.text5,fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
             <SizeBadge size={feature.size} onChange={v=>onUpdate(feature.id,{size:v})} editable={editable}/>
+            <LabelPicker labelId={feature.labelId||null} onChange={v=>onUpdate(feature.id,{labelId:v})} labels={labels} editable={editable&&!isPublic}/>
             <InlineEdit value={feature.name} onChange={v=>onUpdate(feature.id,{name:v})} editable={editable} T={T} style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,color:T.text,lineHeight:1.4,wordBreak:"break-word",whiteSpace:"normal"}}/>
             <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:2}}>
               <span onClick={toggleCollapsed} style={{fontSize:10,color:T.text5,cursor:"pointer",padding:"0 2px"}}>{collapsed?"▸":"▾"}</span>
@@ -603,7 +619,7 @@ export default function App() {
 
   const updateFeature = (fid,ch) => upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.map(f=>f.id===fid?{...f,...ch}:f)}))}));
   const deleteFeature = fid => upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.filter(f=>f.id!==fid)}))}));
-  const addFeature = sid => upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,features:[...s.features,{id:newId(),name:"New feature",size:"M",phases:{product:"not-started",design:"not-started",eng:"not-started"},estNum:"",estUnit:"days",note:"",owners:[],tasks:[]}]}:s)}));
+  const addFeature = sid => upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,features:[...s.features,{id:newId(),name:"New feature",size:"M",phases:{product:"not-started",design:"not-started",eng:"not-started"},estNum:"",estUnit:"days",note:"",owners:[],tasks:[],labelId:null}]}:s)}));
   const updateSprint = (sid,ch) => upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,...ch}:s)}));
   const deleteSprint = sid => upd(p=>({...p,sprints:p.sprints.filter(s=>s.id!==sid)}));
   const addSprint = () => upd(p=>({...p,sprints:[...p.sprints,{id:newId(),label:`Sprint ${58+p.sprints.length-3}`,dates:"Dates TBD",features:[]}]}));
