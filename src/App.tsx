@@ -469,7 +469,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
       <div draggable={editable&&dragging}
         onDragStart={editable&&dragging?e=>{ e.dataTransfer.effectAllowed="move"; e.stopPropagation(); onDragStart(feature.id); }:e=>e.preventDefault()}
         onDragEnd={editable?()=>{ onDragEnd(); setDragging(false); }:undefined}
-        style={{background:T.bg3,border:`0.5px solid ${bc}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:darkMode?"0 1px 3px rgba(0,0,0,.4)":"0 1px 4px rgba(0,0,0,.08)"}}>
+        style={{background:T.bg3,border:`${feature.phases.eng!=="not-started"?"2px":"0.5px"} solid ${bc}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:darkMode?"0 1px 3px rgba(0,0,0,.4)":"0 1px 4px rgba(0,0,0,.08)"}}>
         {/* Header — label-tinted */}
         <div style={{background:headerBg,padding:"9px 10px"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
