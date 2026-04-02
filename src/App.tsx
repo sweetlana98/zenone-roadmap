@@ -44,27 +44,27 @@ let OWNER_COLORS = {
 };
 
 const LABEL_COLORS = [
-  { id:"green",    bg:"#4a7c59", light:"#d4ead9", border:"#91c4a0", muted:"rgba(74,124,89,0.18)"  },
-  { id:"blue",     bg:"#3d6fa8", light:"#d0e4f7", border:"#8ab8e8", muted:"rgba(61,111,168,0.18)" },
-  { id:"purple",   bg:"#7059a8", light:"#e5dff7", border:"#b5a8e0", muted:"rgba(112,89,168,0.18)" },
-  { id:"amber",    bg:"#a07830", light:"#f5e8c8", border:"#d4b878", muted:"rgba(160,120,48,0.18)" },
-  { id:"red",      bg:"#a05050", light:"#f5d8d8", border:"#d49090", muted:"rgba(160,80,80,0.18)"  },
-  { id:"pink",     bg:"#a0507a", light:"#f5d8ea", border:"#d490b8", muted:"rgba(160,80,122,0.18)" },
-  { id:"teal",     bg:"#3a8a80", light:"#c8ecea", border:"#80ccc8", muted:"rgba(58,138,128,0.18)" },
-  { id:"orange",   bg:"#a06038", light:"#f5e0cc", border:"#d4a880", muted:"rgba(160,96,56,0.18)"  },
-  { id:"slate",    bg:"#506880", light:"#d8e4f0", border:"#90aac8", muted:"rgba(80,104,128,0.18)" },
-  { id:"rose",     bg:"#a05868", light:"#f5d8de", border:"#d498a8", muted:"rgba(160,88,104,0.18)" },
-  { id:"indigo",   bg:"#4858a8", light:"#d8dcf5", border:"#98a8e0", muted:"rgba(72,88,168,0.18)"  },
-  { id:"lime",     bg:"#5a8038", light:"#ddeec8", border:"#a0cc80", muted:"rgba(90,128,56,0.18)"  },
-  { id:"cyan",     bg:"#2a7890", light:"#c8e8f0", border:"#70bcd0", muted:"rgba(42,120,144,0.18)" },
-  { id:"fuchsia",  bg:"#885098", light:"#f0d8f5", border:"#cc90e0", muted:"rgba(136,80,152,0.18)" },
-  { id:"brown",    bg:"#7a5040", light:"#ead8d0", border:"#c0988a", muted:"rgba(122,80,64,0.18)"  },
-  { id:"stone",    bg:"#6a6458", light:"#e5e2da", border:"#b0a898", muted:"rgba(106,100,88,0.18)" },
+  { id:"green",   bg:"#4a7c59", light:"#d4ead9", border:"#91c4a0", muted:"rgba(74,124,89,0.18)"   },
+  { id:"blue",    bg:"#3d6fa8", light:"#d0e4f7", border:"#8ab8e8", muted:"rgba(61,111,168,0.18)"  },
+  { id:"purple",  bg:"#7059a8", light:"#e5dff7", border:"#b5a8e0", muted:"rgba(112,89,168,0.18)"  },
+  { id:"amber",   bg:"#a07830", light:"#f5e8c8", border:"#d4b878", muted:"rgba(160,120,48,0.18)"  },
+  { id:"red",     bg:"#a05050", light:"#f5d8d8", border:"#d49090", muted:"rgba(160,80,80,0.18)"   },
+  { id:"pink",    bg:"#a0507a", light:"#f5d8ea", border:"#d490b8", muted:"rgba(160,80,122,0.18)"  },
+  { id:"teal",    bg:"#3a8a80", light:"#c8ecea", border:"#80ccc8", muted:"rgba(58,138,128,0.18)"  },
+  { id:"orange",  bg:"#a06038", light:"#f5e0cc", border:"#d4a880", muted:"rgba(160,96,56,0.18)"   },
+  { id:"slate",   bg:"#506880", light:"#d8e4f0", border:"#90aac8", muted:"rgba(80,104,128,0.18)"  },
+  { id:"rose",    bg:"#a05868", light:"#f5d8de", border:"#d498a8", muted:"rgba(160,88,104,0.18)"  },
+  { id:"indigo",  bg:"#4858a8", light:"#d8dcf5", border:"#98a8e0", muted:"rgba(72,88,168,0.18)"   },
+  { id:"lime",    bg:"#5a8038", light:"#ddeec8", border:"#a0cc80", muted:"rgba(90,128,56,0.18)"   },
+  { id:"cyan",    bg:"#2a7890", light:"#c8e8f0", border:"#70bcd0", muted:"rgba(42,120,144,0.18)"  },
+  { id:"fuchsia", bg:"#885098", light:"#f0d8f5", border:"#cc90e0", muted:"rgba(136,80,152,0.18)"  },
+  { id:"brown",   bg:"#7a5040", light:"#ead8d0", border:"#c0988a", muted:"rgba(122,80,64,0.18)"   },
+  { id:"stone",   bg:"#6a6458", light:"#e5e2da", border:"#b0a898", muted:"rgba(106,100,88,0.18)"  },
 ];
 
 const STICKY_COLORS = ["#fef08a","#86efac","#93c5fd","#f9a8d4","#fdba74","#c4b5fd"];
 
-const DARK = { bg:"#0f0f0f",bg2:"#141414",bg3:"#1a1a1a",bg4:"#1f1f1f",bg5:"#242424",border:"#2a2a2a",border2:"#333",border3:"#444",text:"#f0f0f0",text2:"#e0e0e0",text3:"#c0c0c0",text4:"#6b7280",text5:"#555",text6:"#333",inputBg:"#2a2a2a",inputBorder:"#555" };
+const DARK  = { bg:"#0f0f0f",bg2:"#141414",bg3:"#1a1a1a",bg4:"#1f1f1f",bg5:"#242424",border:"#2a2a2a",border2:"#333",border3:"#444",text:"#f0f0f0",text2:"#e0e0e0",text3:"#c0c0c0",text4:"#6b7280",text5:"#555",text6:"#333",inputBg:"#2a2a2a",inputBorder:"#555" };
 const LIGHT = { bg:"#f5f5f4",bg2:"#ffffff",bg3:"#fafaf9",bg4:"#f0efed",bg5:"#e8e8e6",border:"#d4d2cc",border2:"#c4c2bc",border3:"#b4b2ac",text:"#1c1c1a",text2:"#2c2c2a",text3:"#4c4c4a",text4:"#6c6c6a",text5:"#9c9c9a",text6:"#bbb",inputBg:"#ffffff",inputBorder:"#b4b2ac" };
 
 let uid = 2000;
@@ -122,8 +122,13 @@ function SizeBadge({ size, onChange, editable }) {
 function InlineEdit({ value, onChange, style={}, placeholder="Edit…", editable=true, T }) {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(value);
-  useEffect(() => setVal(value), [value]);
-  const commit = () => { setEditing(false); if (val !== value) onChange(val); };
+  const prevValueRef = useRef(value);
+  // Sync external value changes without waiting for useEffect (prevents stale-value bleed)
+  if (!editing && prevValueRef.current !== value) {
+    prevValueRef.current = value;
+    setVal(value);
+  }
+  const commit = () => { setEditing(false); prevValueRef.current = val; if (val !== value) onChange(val); };
   if (!editable || !editing) return (
     <span onClick={editable ? e => { e.stopPropagation(); setEditing(true); } : undefined} style={{cursor:editable?"text":"default",...style}}>
       {value || <span style={{opacity:0.3}}>{editable ? placeholder : ""}</span>}
@@ -220,7 +225,6 @@ function LabelPicker({ labelId, onChange, labels, editable }) {
   if (!editable && current) return (
     <span style={{width:10,height:10,borderRadius:"50%",background:lc?lc.bg:"#888",flexShrink:0,display:"inline-block"}} title={current.name}/>
   );
-
   return (
     <div ref={ref} style={{position:"relative",flexShrink:0}}>
       <span onClick={e=>{ e.stopPropagation(); setOpen(o=>!o); }} title="Assign label"
@@ -244,97 +248,11 @@ function LabelPicker({ labelId, onChange, labels, editable }) {
   );
 }
 
-// ── Sticky Notes ──────────────────────────────────────────────────────────────
-function StickyNotes({ notes, onAdd, onUpdate, onDelete, editable, darkMode, T }) {
-  const [collapsed, setCollapsed] = useState(false);
-
-  return (
-    <div style={{position:"fixed",bottom:16,right:16,zIndex:2000,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
-      {/* Toggle button */}
-      <button
-        onClick={() => setCollapsed(c => !c)}
-        title={collapsed ? "Show sticky notes" : "Collapse sticky notes"}
-        style={{background:darkMode?"#1f1f1f":"#fff",border:`0.5px solid ${T.border2}`,borderRadius:20,padding:"4px 12px",fontSize:11,color:T.text4,cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,.3)",display:"flex",alignItems:"center",gap:6}}>
-        📝 {collapsed ? `Notes (${notes.length})` : "Notes ▾"}
-      </button>
-
-      {!collapsed && (
-        <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"flex-end",maxHeight:"60vh",overflowY:"auto"}}>
-          {notes.map(note => (
-            <StickyNote key={note.id} note={note} onUpdate={onUpdate} onDelete={onDelete} editable={editable} darkMode={darkMode} T={T}/>
-          ))}
-          {editable && (
-            <button onClick={onAdd} style={{background:"transparent",border:`0.5px dashed ${T.border2}`,borderRadius:8,color:T.text5,fontSize:11,padding:"5px 14px",cursor:"pointer"}}>+ Add note</button>
-          )}
-          {notes.length === 0 && !editable && (
-            <div style={{fontSize:11,color:T.text5,padding:"4px 8px"}}>No notes yet</div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function StickyNote({ note, onUpdate, onDelete, editable, darkMode, T }) {
-  const [confirmDel, setConfirmDel] = useState(false);
-  const [colorOpen, setColorOpen] = useState(false);
-  const ref = useRef();
-  useClickOutside(ref, () => { setConfirmDel(false); setColorOpen(false); });
-  const bg = note.color || STICKY_COLORS[0];
-
-  return (
-    <div ref={ref} style={{background:bg,borderRadius:8,padding:"8px 10px",width:200,boxShadow:"0 2px 8px rgba(0,0,0,.25)",position:"relative",flexShrink:0}}>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
-        {editable && (
-          <div style={{position:"relative"}}>
-            <span onClick={() => setColorOpen(o=>!o)} style={{width:12,height:12,borderRadius:"50%",background:bg,border:"1.5px solid rgba(0,0,0,0.2)",display:"inline-block",cursor:"pointer",flexShrink:0}}/>
-            {colorOpen && (
-              <div style={{position:"absolute",bottom:20,left:0,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:8,display:"flex",gap:5,flexWrap:"wrap",width:126,zIndex:100,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
-                {STICKY_COLORS.map(c => (
-                  <span key={c} onClick={() => { onUpdate(note.id,{color:c}); setColorOpen(false); }}
-                    style={{width:20,height:20,borderRadius:"50%",background:c,cursor:"pointer",border:note.color===c?"2px solid #fff":"2px solid transparent",boxSizing:"border-box"}}/>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-        <div style={{display:"flex",gap:4,alignItems:"center",marginLeft:"auto"}}>
-          {editable && !confirmDel && (
-            <span onClick={() => setConfirmDel(true)} style={{fontSize:10,color:"rgba(0,0,0,0.35)",cursor:"pointer",lineHeight:1}}>✕</span>
-          )}
-          {confirmDel && (
-            <span style={{display:"flex",gap:4,alignItems:"center"}}>
-              <span style={{fontSize:10,color:"rgba(0,0,0,0.6)"}}>Delete?</span>
-              <span onClick={() => onDelete(note.id)} style={{fontSize:10,color:"#dc2626",cursor:"pointer",fontWeight:600}}>Yes</span>
-              <span onClick={() => setConfirmDel(false)} style={{fontSize:10,color:"rgba(0,0,0,0.4)",cursor:"pointer"}}>No</span>
-            </span>
-          )}
-        </div>
-      </div>
-      {editable ? (
-        <textarea
-          value={note.text}
-          onChange={e => onUpdate(note.id, {text: e.target.value})}
-          placeholder="Write a note…"
-          rows={3}
-          style={{width:"100%",background:"transparent",border:"none",outline:"none",resize:"vertical",fontSize:12,color:"rgba(0,0,0,0.75)",fontFamily:"system-ui,sans-serif",lineHeight:1.5,padding:0,boxSizing:"border-box"}}
-        />
-      ) : (
-        <div style={{fontSize:12,color:"rgba(0,0,0,0.75)",lineHeight:1.5,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
-          {note.text || <span style={{opacity:0.4}}>Empty note</span>}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Fixed label bar at top
 function LabelBar({ labels, onAdd, onUpdate, onDelete, editable, darkMode, T }) {
   const [confirmDel, setConfirmDel] = useState(null);
   const [colorPickOpen, setColorPickOpen] = useState(null);
   const colorRef = useRef();
   useClickOutside(colorRef, () => setColorPickOpen(null));
-
   return (
     <div style={{position:"fixed",top:0,left:0,right:0,zIndex:1000,background:darkMode?"rgba(15,15,15,0.95)":"rgba(245,245,244,0.95)",backdropFilter:"blur(8px)",borderBottom:`0.5px solid ${T.border}`,padding:"8px 16px",display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
       <span style={{fontSize:10,fontWeight:500,color:T.text4,whiteSpace:"nowrap"}}>Labels:</span>
@@ -347,11 +265,11 @@ function LabelBar({ labels, onAdd, onUpdate, onDelete, editable, darkMode, T }) 
                 <span onClick={e=>{ e.stopPropagation(); setColorPickOpen(colorPickOpen===l.id?null:l.id); }}
                   style={{width:10,height:10,borderRadius:"50%",background:lc.bg,border:"1.5px solid rgba(255,255,255,0.5)",cursor:"pointer",display:"inline-block",flexShrink:0}}/>
                 {colorPickOpen===l.id && (
-                  <div style={{position:"fixed",background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:8,zIndex:10000,display:"flex",gap:6,flexWrap:"wrap",width:140,boxShadow:"0 8px 24px rgba(0,0,0,.8)"}}
-                    ref={r=>{ if(r&&colorPickOpen===l.id){const el=document.querySelector(`[data-color-btn="${l.id}"]`);if(el){const rc=el.getBoundingClientRect();r.style.top=(rc.bottom+6)+"px";r.style.left=rc.left+"px";}}}}>
+                  <div style={{position:"fixed",background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:8,zIndex:10000,display:"flex",gap:6,flexWrap:"wrap",width:176,boxShadow:"0 8px 24px rgba(0,0,0,.8)"}}
+                    ref={r=>{ if(r){const el=document.activeElement;const rc=colorRef.current?.getBoundingClientRect();if(rc){r.style.top=(rc.bottom+6)+"px";r.style.left=rc.left+"px";}}}}>
                     {LABEL_COLORS.map(c=>(
                       <span key={c.id} onClick={()=>{ onUpdate(l.id,{colorId:c.id}); setColorPickOpen(null); }}
-                        style={{width:20,height:20,borderRadius:"50%",background:c.bg,cursor:"pointer",border:l.colorId===c.id?"3px solid white":"2px solid transparent",boxSizing:"border-box"}}/>
+                        style={{width:20,height:20,borderRadius:"50%",background:c.bg,cursor:"pointer",border:l.colorId===c.id?"3px solid white":"2px solid transparent",boxSizing:"border-box"}} title={c.id}/>
                     ))}
                   </div>
                 )}
@@ -382,32 +300,139 @@ function LabelBar({ labels, onAdd, onUpdate, onDelete, editable, darkMode, T }) 
   );
 }
 
-function DropIndicator() { return <div style={{height:3,background:"#4ade80",borderRadius:2,margin:"2px 0"}}/>; }
+function StickyNotes({ notes, onAdd, onUpdate, onDelete, editable, darkMode, T }) {
+  const [collapsed, setCollapsed] = useState(false);
+  return (
+    <div style={{position:"fixed",bottom:16,right:16,zIndex:2000,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
+      <button onClick={()=>setCollapsed(c=>!c)} style={{background:darkMode?"#1f1f1f":"#fff",border:`0.5px solid ${T.border2}`,borderRadius:20,padding:"4px 12px",fontSize:11,color:T.text4,cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,.3)",display:"flex",alignItems:"center",gap:6}}>
+        📝 {collapsed?`Notes (${notes.length})`:"Notes ▾"}
+      </button>
+      {!collapsed && (
+        <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"flex-end",maxHeight:"60vh",overflowY:"auto"}}>
+          {notes.map(note=>(
+            <StickyNote key={note.id} note={note} onUpdate={onUpdate} onDelete={onDelete} editable={editable} darkMode={darkMode} T={T}/>
+          ))}
+          {editable && <button onClick={onAdd} style={{background:"transparent",border:`0.5px dashed ${T.border2}`,borderRadius:8,color:T.text5,fontSize:11,padding:"5px 14px",cursor:"pointer"}}>+ Add note</button>}
+          {notes.length===0&&!editable&&<div style={{fontSize:11,color:T.text5,padding:"4px 8px"}}>No notes yet</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StickyNote({ note, onUpdate, onDelete, editable, darkMode, T }) {
+  const [confirmDel, setConfirmDel] = useState(false);
+  const [colorOpen, setColorOpen] = useState(false);
+  const ref = useRef();
+  useClickOutside(ref, ()=>{ setConfirmDel(false); setColorOpen(false); });
+  const bg = note.color||STICKY_COLORS[0];
+  return (
+    <div ref={ref} style={{background:bg,borderRadius:8,padding:"8px 10px",width:200,boxShadow:"0 2px 8px rgba(0,0,0,.25)",position:"relative",flexShrink:0}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+        {editable && (
+          <div style={{position:"relative"}}>
+            <span onClick={()=>setColorOpen(o=>!o)} style={{width:12,height:12,borderRadius:"50%",background:bg,border:"1.5px solid rgba(0,0,0,0.2)",display:"inline-block",cursor:"pointer",flexShrink:0}}/>
+            {colorOpen && (
+              <div style={{position:"absolute",bottom:20,left:0,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:8,display:"flex",gap:5,flexWrap:"wrap",width:126,zIndex:100,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
+                {STICKY_COLORS.map(c=>(
+                  <span key={c} onClick={()=>{ onUpdate(note.id,{color:c}); setColorOpen(false); }}
+                    style={{width:20,height:20,borderRadius:"50%",background:c,cursor:"pointer",border:note.color===c?"2px solid #fff":"2px solid transparent",boxSizing:"border-box"}}/>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        <div style={{display:"flex",gap:4,alignItems:"center",marginLeft:"auto"}}>
+          {editable&&!confirmDel&&<span onClick={()=>setConfirmDel(true)} style={{fontSize:10,color:"rgba(0,0,0,0.35)",cursor:"pointer",lineHeight:1}}>✕</span>}
+          {confirmDel&&<span style={{display:"flex",gap:4,alignItems:"center"}}>
+            <span style={{fontSize:10,color:"rgba(0,0,0,0.6)"}}>Delete?</span>
+            <span onClick={()=>onDelete(note.id)} style={{fontSize:10,color:"#dc2626",cursor:"pointer",fontWeight:600}}>Yes</span>
+            <span onClick={()=>setConfirmDel(false)} style={{fontSize:10,color:"rgba(0,0,0,0.4)",cursor:"pointer"}}>No</span>
+          </span>}
+        </div>
+      </div>
+      {editable
+        ? <textarea value={note.text} onChange={e=>onUpdate(note.id,{text:e.target.value})} placeholder="Write a note…" rows={3}
+            style={{width:"100%",background:"transparent",border:"none",outline:"none",resize:"vertical",fontSize:12,color:"rgba(0,0,0,0.75)",fontFamily:"system-ui,sans-serif",lineHeight:1.5,padding:0,boxSizing:"border-box"}}/>
+        : <div style={{fontSize:12,color:"rgba(0,0,0,0.75)",lineHeight:1.5,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>{note.text||<span style={{opacity:.4}}>Empty note</span>}</div>
+      }
+    </div>
+  );
+}
+
+function DropIndicator() {
+  return <div style={{height:3,background:"#4ade80",borderRadius:2,margin:"2px 0"}}/>;
+}
+
+// Local-state textarea — only commits to parent on blur/Enter, preventing cross-card re-renders
+function TaskTextarea({ value, onCommit, T }) {
+  const [local, setLocal] = useState(value);
+  const taRef = useRef();
+  useEffect(()=>{ setLocal(value); },[value]);
+  const resize = el => { if(el){ el.style.height="auto"; el.style.height=el.scrollHeight+"px"; } };
+  useEffect(()=>{ resize(taRef.current); },[local]);
+  return (
+    <textarea ref={r=>{ taRef.current=r; resize(r); }} value={local}
+      onChange={e=>{ setLocal(e.target.value); resize(e.target); }}
+      onBlur={()=>{ if(local!==value) onCommit(local); }}
+      onKeyDown={e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); onCommit(local); taRef.current?.blur(); } e.stopPropagation(); }}
+      placeholder="Task description" rows={1}
+      style={{flex:1,fontSize:11,color:T.text3,lineHeight:1.5,background:"transparent",border:"none",outline:"none",resize:"none",overflow:"hidden",minHeight:18,fontFamily:"system-ui,sans-serif",padding:0,textAlign:"left"}}/>
+  );
+}
 
 function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDragging, onDragOverCard, dropPosition, editable, isPublic, T, darkMode, labels }) {
   const storageKey = `collapsed_${feature.id}`;
-  const [collapsed, setCollapsed] = useState(() => { try { return localStorage.getItem(storageKey)==="true"; } catch { return false; } });
-  const toggleCollapsed = () => { const next=!collapsed; setCollapsed(next); try{localStorage.setItem(storageKey,String(next));}catch{}; };
+  const [collapsed, setCollapsed] = useState(()=>{ try{ return localStorage.getItem(storageKey)==="true"; }catch{ return false; } });
+  const toggleCollapsed = ()=>{ const next=!collapsed; setCollapsed(next); try{localStorage.setItem(storageKey,String(next));}catch{}; };
   const [confirmDel, setConfirmDel] = useState(false);
   const [confirmTask, setConfirmTask] = useState(null);
   const [dragging, setDragging] = useState(false);
   const cardRef = useRef();
   const delRef = useRef();
-  useClickOutside(delRef, () => setConfirmDel(false));
+  useClickOutside(delRef, ()=>setConfirmDel(false));
 
-  const cyclePhase = key => { const o=["not-started","in-progress","done"]; onUpdate(feature.id,{phases:{...feature.phases,[key]:o[(o.indexOf(feature.phases[key])+1)%o.length]}}); };
-  const updateTask = (tid,ch) => onUpdate(feature.id,{tasks:feature.tasks.map(t=>t.id===tid?{...t,...ch}:t)});
-  const addTask = () => onUpdate(feature.id,{tasks:[...feature.tasks,{id:newId(),name:"",owners:[],done:false,jiraId:"",labelId:null}]});
-  const deleteTask = tid => onUpdate(feature.id,{tasks:feature.tasks.filter(t=>t.id!==tid)});
-  const onDragOv = e => { if(!editable)return; e.preventDefault(); e.stopPropagation(); const r=cardRef.current.getBoundingClientRect(); onDragOverCard(feature.id,e.clientY<r.top+r.height/2?"before":"after"); };
+  // Always-fresh ref so callbacks never go stale
+  const featureRef = useRef(feature);
+  useEffect(()=>{ featureRef.current=feature; },[feature]);
+
+  const cyclePhase = useCallback(key=>{
+    const f=featureRef.current; const o=["not-started","in-progress","done"];
+    onUpdate(f.id,{phases:{...f.phases,[key]:o[(o.indexOf(f.phases[key])+1)%o.length]}});
+  },[onUpdate]);
+
+  const updateTask = useCallback((tid,ch)=>{
+    const f=featureRef.current;
+    onUpdate(f.id,{tasks:f.tasks.map(t=>t.id===tid?{...t,...ch}:t)});
+  },[onUpdate]);
+
+  const addTask = useCallback(()=>{
+    const f=featureRef.current;
+    onUpdate(f.id,{tasks:[...f.tasks,{id:newId(),name:"",owners:[],done:false,jiraId:"",labelId:null}]});
+  },[onUpdate]);
+
+  const deleteTask = useCallback(tid=>{
+    const f=featureRef.current;
+    onUpdate(f.id,{tasks:f.tasks.filter(t=>t.id!==tid)});
+  },[onUpdate]);
+
+  const onDragOv = e=>{
+    if(!editable) return; e.preventDefault(); e.stopPropagation();
+    const r=cardRef.current.getBoundingClientRect();
+    onDragOverCard(feature.id, e.clientY<r.top+r.height/2?"before":"after");
+  };
+
+  // Eng-state border color
   const bc = feature.phases.eng==="done"?"#166534":feature.phases.eng==="in-progress"?"#854d0e":T.border;
 
-  // Derive label color from any task that has a label (first one wins for the card header)
-  const cardLabelId = feature.labelId || null;
-  const cardLabel = labels.find(l => l.id === cardLabelId);
-  const cardLc = cardLabel ? LABEL_COLORS.find(c => c.id === cardLabel.colorId) || LABEL_COLORS[0] : null;
-  const headerBg = cardLc ? (darkMode ? `rgba(${parseInt(cardLc.bg.slice(1,3),16)},${parseInt(cardLc.bg.slice(3,5),16)},${parseInt(cardLc.bg.slice(5,7),16)},0.22)` : cardLc.light) : T.bg4;
-  const headerBorder = bc;
+  // Label wash for card header background only
+  const cardLabel = labels.find(l=>l.id===feature.labelId);
+  const cardLc = cardLabel ? LABEL_COLORS.find(c=>c.id===cardLabel.colorId)||LABEL_COLORS[0] : null;
+  const headerBg = cardLc
+    ? darkMode
+      ? `rgba(${parseInt(cardLc.bg.slice(1,3),16)},${parseInt(cardLc.bg.slice(3,5),16)},${parseInt(cardLc.bg.slice(5,7),16)},0.22)`
+      : cardLc.light
+    : T.bg4;
 
   return (
     <div ref={cardRef} onDragOver={onDragOv}>
@@ -415,7 +440,8 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
       <div draggable={editable&&dragging}
         onDragStart={editable&&dragging?e=>{ e.dataTransfer.effectAllowed="move"; e.stopPropagation(); onDragStart(feature.id); }:e=>e.preventDefault()}
         onDragEnd={editable?()=>{ onDragEnd(); setDragging(false); }:undefined}
-        style={{background:T.bg3,border:`0.5px solid ${headerBorder}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:darkMode?"0 1px 3px rgba(0,0,0,.4)":"0 1px 4px rgba(0,0,0,.08)"}}>
+        style={{background:T.bg3,border:`0.5px solid ${bc}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:darkMode?"0 1px 3px rgba(0,0,0,.4)":"0 1px 4px rgba(0,0,0,.08)"}}>
+        {/* Header — label-tinted */}
         <div style={{background:headerBg,padding:"9px 10px"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
             {editable && <span onMouseDown={e=>{ e.stopPropagation(); setDragging(true); }} onMouseUp={()=>setDragging(false)} onMouseLeave={()=>setDragging(false)} style={{color:T.text5,fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
@@ -441,28 +467,24 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
             <OwnersPicker owners={feature.owners||[]} onChange={v=>onUpdate(feature.id,{owners:v})} editable={editable} T={T}/>
           </div>
         </div>
-        {!collapsed && <div style={{padding:"8px 10px 10px"}}>
-          <div style={{display:"flex",gap:5,marginBottom:8,flexWrap:"wrap"}}>
-            {[["product","Product"],["design","Design"],["eng","Eng"]].map(([key,lbl]) => {
-              const cfg=PHASE_CFG[feature.phases[key]]; const c=darkMode?cfg.dark:cfg.light;
-              return <span key={key} onClick={!isPublic?()=>cyclePhase(key):undefined} style={{display:"inline-flex",alignItems:"center",background:c.bg,color:c.text,border:`0.5px solid ${c.border}`,borderRadius:4,padding:"2px 7px",fontSize:10,fontWeight:500,textDecoration:cfg.strike?"line-through":"none",cursor:isPublic?"default":"pointer",userSelect:"none",whiteSpace:"nowrap"}}>{lbl}</span>;
-            })}
-          </div>
-          <div style={{display:"flex",flexDirection:"column",gap:3,marginBottom:6}}>
-            {(feature.tasks||[]).map(task => {
-              const lbl = labels.find(l=>l.id===task.labelId);
-              const lc = lbl ? LABEL_COLORS.find(c=>c.id===lbl.colorId)||LABEL_COLORS[0] : null;
-              return (
-                <div key={task.id} style={{display:"flex",alignItems:"flex-start",gap:6,background:T.bg5,borderRadius:6,padding:"5px 8px",borderTop:`0.5px solid ${task.done?"#166534":T.border}`,borderRight:`0.5px solid ${task.done?"#166534":T.border}`,borderBottom:`0.5px solid ${task.done?"#166534":T.border}`,borderLeft:`3px solid ${lc?lc.bg:task.done?"#166534":T.border}`,textAlign:"left"}}>
+        {!collapsed && (
+          <div style={{padding:"8px 10px 10px"}}>
+            <div style={{display:"flex",gap:5,marginBottom:8,flexWrap:"wrap"}}>
+              {[["product","Product"],["design","Design"],["eng","Eng"]].map(([key,lbl])=>{
+                const cfg=PHASE_CFG[feature.phases[key]]; const c=darkMode?cfg.dark:cfg.light;
+                return <span key={key} onClick={!isPublic?()=>cyclePhase(key):undefined} style={{display:"inline-flex",alignItems:"center",background:c.bg,color:c.text,border:`0.5px solid ${c.border}`,borderRadius:4,padding:"2px 7px",fontSize:10,fontWeight:500,textDecoration:cfg.strike?"line-through":"none",cursor:isPublic?"default":"pointer",userSelect:"none",whiteSpace:"nowrap"}}>{lbl}</span>;
+              })}
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:3,marginBottom:6}}>
+              {(feature.tasks||[]).map(task=>(
+                <div key={task.id} style={{display:"flex",alignItems:"flex-start",gap:6,background:T.bg5,borderRadius:6,padding:"5px 8px",border:`0.5px solid ${task.done?"#166534":T.border}`,textAlign:"left"}}>
                   <div onClick={!isPublic?()=>updateTask(task.id,{done:!task.done}):undefined} style={{width:14,height:14,borderRadius:3,border:`0.5px solid ${task.done?"#166534":T.border3}`,background:task.done?"#1a3a2a":"transparent",flexShrink:0,marginTop:3,cursor:isPublic?"default":"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
                     {task.done && <span style={{color:"#4ade80",fontSize:10,lineHeight:1}}>✓</span>}
                   </div>
-                  {editable && !task.done ? (
-                    <textarea value={task.name} onChange={e=>{ updateTask(task.id,{name:e.target.value}); e.target.style.height="auto"; e.target.style.height=e.target.scrollHeight+"px"; }} onFocus={e=>{ e.target.style.height="auto"; e.target.style.height=e.target.scrollHeight+"px"; }} placeholder="Task description" rows={1}
-                      style={{flex:1,fontSize:11,color:T.text3,lineHeight:1.5,background:"transparent",border:"none",outline:"none",resize:"none",overflow:"hidden",minHeight:18,fontFamily:"system-ui,sans-serif",padding:0,textAlign:"left"}}/>
-                  ) : (
-                    <span style={{flex:1,fontSize:11,color:task.done?T.text4:T.text3,lineHeight:1.5,textDecoration:task.done?"line-through":"none",opacity:task.done?0.6:1,textAlign:"left",wordBreak:"break-word",whiteSpace:"normal"}}>{task.name||<span style={{opacity:.3}}>Task description</span>}</span>
-                  )}
+                  {editable&&!task.done
+                    ? <TaskTextarea value={task.name} onCommit={v=>updateTask(task.id,{name:v})} T={T}/>
+                    : <span style={{flex:1,fontSize:11,color:task.done?T.text4:T.text3,lineHeight:1.5,textDecoration:task.done?"line-through":"none",opacity:task.done?.6:1,textAlign:"left",wordBreak:"break-word",whiteSpace:"normal"}}>{task.name||<span style={{opacity:.3}}>Task description</span>}</span>
+                  }
                   <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:1}}>
                     <JiraTag ticketId={task.jiraId} onChange={v=>updateTask(task.id,{jiraId:v})} editable={editable}/>
                     <OwnersPicker owners={task.owners||[]} onChange={v=>updateTask(task.id,{owners:v})} editable={editable} T={T}/>
@@ -478,25 +500,25 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
                     </div>}
                   </div>
                 </div>
-              );
-            })}
-            {editable && <button onClick={addTask} style={{background:"transparent",border:`0.5px dashed ${T.border2}`,borderRadius:6,color:T.text5,fontSize:10,padding:"4px 8px",cursor:"pointer",textAlign:"left"}}>+ Add task</button>}
+              ))}
+              {editable && <button onClick={addTask} style={{background:"transparent",border:`0.5px dashed ${T.border2}`,borderRadius:6,color:T.text5,fontSize:10,padding:"4px 8px",cursor:"pointer",textAlign:"left"}}>+ Add task</button>}
+            </div>
+            <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap",paddingTop:4,borderTop:`0.5px solid ${T.border}`}}>
+              {editable ? <>
+                <span style={{fontSize:10,color:T.text4}}>EST:</span>
+                <input type="number" min="0" value={feature.estNum||""} onChange={e=>onUpdate(feature.id,{estNum:e.target.value})} placeholder="–" style={{width:36,background:T.inputBg,border:`0.5px solid ${T.border2}`,borderRadius:4,color:T.text4,fontSize:10,padding:"2px 4px",outline:"none",textAlign:"center"}}/>
+                <select value={feature.estUnit||"days"} onChange={e=>onUpdate(feature.id,{estUnit:e.target.value})} style={{background:T.inputBg,border:`0.5px solid ${T.border2}`,borderRadius:4,color:T.text4,fontSize:10,padding:"2px 4px",outline:"none",cursor:"pointer"}}>
+                  <option value="days">day(s)</option>
+                  <option value="weeks">week(s)</option>
+                </select>
+                <InlineEdit value={feature.note||""} onChange={v=>onUpdate(feature.id,{note:v})} editable T={T} placeholder="+ add note" style={{fontSize:10,color:T.text4,fontStyle:"italic"}}/>
+              </> : <>
+                {feature.estNum && <span style={{fontSize:10,color:T.text4}}>EST: {feature.estNum} {feature.estUnit}</span>}
+                {feature.note && <span style={{fontSize:10,color:T.text4,fontStyle:"italic"}}>{feature.note}</span>}
+              </>}
+            </div>
           </div>
-          <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap",paddingTop:4,borderTop:`0.5px solid ${T.border}`}}>
-            {editable ? <>
-              <span style={{fontSize:10,color:T.text4}}>EST:</span>
-              <input type="number" min="0" value={feature.estNum||""} onChange={e=>onUpdate(feature.id,{estNum:e.target.value})} placeholder="–" style={{width:36,background:T.inputBg,border:`0.5px solid ${T.border2}`,borderRadius:4,color:T.text4,fontSize:10,padding:"2px 4px",outline:"none",textAlign:"center"}}/>
-              <select value={feature.estUnit||"days"} onChange={e=>onUpdate(feature.id,{estUnit:e.target.value})} style={{background:T.inputBg,border:`0.5px solid ${T.border2}`,borderRadius:4,color:T.text4,fontSize:10,padding:"2px 4px",outline:"none",cursor:"pointer"}}>
-                <option value="days">day(s)</option>
-                <option value="weeks">week(s)</option>
-              </select>
-              <InlineEdit value={feature.note||""} onChange={v=>onUpdate(feature.id,{note:v})} editable T={T} placeholder="+ add note" style={{fontSize:10,color:T.text4,fontStyle:"italic"}}/>
-            </> : <>
-              {feature.estNum && <span style={{fontSize:10,color:T.text4}}>EST: {feature.estNum} {feature.estUnit}</span>}
-              {feature.note && <span style={{fontSize:10,color:T.text4,fontStyle:"italic"}}>{feature.note}</span>}
-            </>}
-          </div>
-        </div>}
+        )}
       </div>
       {dropPosition==="after" && <DropIndicator/>}
     </div>
@@ -542,8 +564,8 @@ function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onU
         </div>
       </div>
       {emptyTarget && <DropIndicator/>}
-      {(sprint.features||[]).map(f => {
-        const pos = editable&&dropTarget?.sprintId===sprint.id&&dropTarget?.featureId===f.id?dropTarget.position:null;
+      {(sprint.features||[]).map(f=>{
+        const pos=editable&&dropTarget?.sprintId===sprint.id&&dropTarget?.featureId===f.id?dropTarget.position:null;
         return <FeatureCard key={f.id} feature={f} onUpdate={onUpdateFeature} onDelete={onDeleteFeature} onDragStart={onDragStart} onDragEnd={onDragEnd} isDragging={draggingId===f.id} onDragOverCard={(fid,p)=>onDragOverCard(sprint.id,fid,p)} dropPosition={pos} editable={editable} isPublic={isPublic} T={T} darkMode={darkMode} labels={labels}/>;
       })}
       {editable && <button onClick={()=>onAddFeature(sprint.id)} style={{width:"100%",background:"transparent",border:`0.5px dashed ${T.border}`,borderRadius:8,color:T.text5,fontSize:11,padding:"7px",cursor:"pointer",marginTop:4}}>+ New feature</button>}
@@ -563,107 +585,111 @@ export default function App() {
   const [overSprintId, setOverSprintId] = useState(null);
   const [sprintDropSide, setSprintDropSide] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => { try { return localStorage.getItem("darkMode") !== "false"; } catch { return true; } });
+  const [darkMode, setDarkMode] = useState(()=>{ try{ return localStorage.getItem("darkMode")!=="false"; }catch{ return true; } });
   const saveTimer = useRef(null);
   const boardRef = useRef(null);
   const isPanning = useRef(false);
   const panStart = useRef({x:0,y:0,scrollX:0,scrollY:0});
 
   const T = darkMode ? DARK : LIGHT;
-  const isPublic = new URLSearchParams(window.location.search).get("view") === "public";
-  const editable = editMode && filter === "all" && !isPublic;
+  const isPublic = new URLSearchParams(window.location.search).get("view")==="public";
+  const editable = editMode&&filter==="all"&&!isPublic;
 
-  const labels = data?.labels || [];
-  const stickyNotes = data?.stickyNotes || [];
+  const labels = data?.labels||[];
+  const stickyNotes = data?.stickyNotes||[];
 
-  const updLabels = fn => upd(p => ({...p, labels: fn(p.labels||[])}));
-  const addLabel = () => updLabels(ls => [...ls, {id:newId(), name:"New label", colorId:LABEL_COLORS[ls.length%LABEL_COLORS.length].id}]);
-  const updateLabel = (id, ch) => updLabels(ls => ls.map(l=>l.id===id?{...l,...ch}:l));
-  const deleteLabel = id => updLabels(ls => ls.filter(l=>l.id!==id));
+  const updLabels = fn => upd(p=>({...p,labels:fn(p.labels||[])}));
+  const addLabel = () => updLabels(ls=>[...ls,{id:newId(),name:"New label",colorId:LABEL_COLORS[ls.length%LABEL_COLORS.length].id}]);
+  const updateLabel = (id,ch) => updLabels(ls=>ls.map(l=>l.id===id?{...l,...ch}:l));
+  const deleteLabel = id => updLabels(ls=>ls.filter(l=>l.id!==id));
 
-  const updStickies = fn => upd(p => ({...p, stickyNotes: fn(p.stickyNotes||[])}));
-  const addSticky = () => updStickies(ns => [...ns, {id:newId(), text:"", color:STICKY_COLORS[ns.length%STICKY_COLORS.length]}]);
-  const updateSticky = (id, ch) => updStickies(ns => ns.map(n=>n.id===id?{...n,...ch}:n));
-  const deleteSticky = id => updStickies(ns => ns.filter(n=>n.id!==id));
+  const updStickies = fn => upd(p=>({...p,stickyNotes:fn(p.stickyNotes||[])}));
+  const addSticky = () => updStickies(ns=>[...ns,{id:newId(),text:"",color:STICKY_COLORS[ns.length%STICKY_COLORS.length]}]);
+  const updateSticky = (id,ch) => updStickies(ns=>ns.map(n=>n.id===id?{...n,...ch}:n));
+  const deleteSticky = id => updStickies(ns=>ns.filter(n=>n.id!==id));
 
-  const toggleDark = () => { setDarkMode(d => { const next=!d; try{localStorage.setItem("darkMode",String(next));}catch{} return next; }); };
+  const toggleDark = () => { setDarkMode(d=>{ const next=!d; try{localStorage.setItem("darkMode",String(next));}catch{} return next; }); };
 
-  useEffect(() => {
-    const bg = darkMode ? DARK.bg : LIGHT.bg;
-    document.body.style.background = bg;
-    document.documentElement.style.background = bg;
-  }, [darkMode]);
+  useEffect(()=>{
+    const bg=darkMode?DARK.bg:LIGHT.bg;
+    document.body.style.background=bg;
+    document.documentElement.style.background=bg;
+  },[darkMode]);
 
-  useEffect(() => {
-    loadData().then(remote => {
-      if (remote && remote.sprints && remote.sprints.length > 0) {
-        const seenIds = new Set();
-        const fixed = { ...remote, labels: remote.labels||[], stickyNotes: remote.stickyNotes||[], sprints: remote.sprints.map(s => ({ ...s, features: s.features.map(f => {
-          const ff = seenIds.has(f.id)?{...f,id:newId()}:f; seenIds.add(ff.id);
-          const tasks = (ff.tasks||[]).map(t => { if(seenIds.has(t.id)){const nt={...t,id:newId()};seenIds.add(nt.id);return nt;} seenIds.add(t.id); return t; });
+  useEffect(()=>{
+    loadData().then(remote=>{
+      if(remote&&remote.sprints&&remote.sprints.length>0){
+        const seenIds=new Set();
+        const fixed={...remote,labels:remote.labels||[],stickyNotes:remote.stickyNotes||[],sprints:remote.sprints.map(s=>({...s,features:s.features.map(f=>{
+          const ff=seenIds.has(f.id)?{...f,id:newId()}:f; seenIds.add(ff.id);
+          const tasks=(ff.tasks||[]).map(t=>{ if(seenIds.has(t.id)){const nt={...t,id:newId()};seenIds.add(nt.id);return nt;} seenIds.add(t.id); return t; });
           return {...ff,tasks};
-        })})) };
+        })}))}; 
         setData(fixed);
       } else setData(INIT_DATA);
-    }).catch(() => setData(INIT_DATA));
-  }, []);
+    }).catch(()=>setData(INIT_DATA));
+  },[]);
 
-  const scheduleSave = useCallback(newData => {
+  const scheduleSave = useCallback(newData=>{
     setSaveStatus("saving");
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(async () => { await saveData(newData); setSaveStatus("saved"); setTimeout(()=>setSaveStatus("idle"),2000); }, 800);
-  }, []);
+    if(saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current=setTimeout(async()=>{ await saveData(newData); setSaveStatus("saved"); setTimeout(()=>setSaveStatus("idle"),2000); },800);
+  },[]);
 
-  const upd = useCallback(fn => setData(prev => { const next=fn(prev); scheduleSave(next); return next; }), [scheduleSave]);
+  const upd = useCallback(fn=>setData(prev=>{ const next=fn(prev); scheduleSave(next); return next; }),[scheduleSave]);
 
-  const updateFeature = (fid,ch) => upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.map(f=>f.id===fid?{...f,...ch}:f)}))}));
-  const deleteFeature = fid => upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.filter(f=>f.id!==fid)}))}));
-  const addFeature = sid => upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,features:[...s.features,{id:newId(),name:"New feature",size:"M",phases:{product:"not-started",design:"not-started",eng:"not-started"},estNum:"",estUnit:"days",note:"",owners:[],tasks:[],labelId:null}]}:s)}));
-  const updateSprint = (sid,ch) => upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,...ch}:s)}));
-  const deleteSprint = sid => upd(p=>({...p,sprints:p.sprints.filter(s=>s.id!==sid)}));
-  const addSprint = () => upd(p=>({...p,sprints:[...p.sprints,{id:newId(),label:`Sprint ${58+p.sprints.length-3}`,dates:"Dates TBD",features:[]}]}));
+  const updateFeature = useCallback((fid,ch)=>upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.map(f=>f.id===fid?{...f,...ch}:f)}))})),[upd]);
+  const deleteFeature = useCallback(fid=>upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.filter(f=>f.id!==fid)}))})),[upd]);
+  const addFeature = useCallback(sid=>upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,features:[...s.features,{id:newId(),name:"New feature",size:"M",phases:{product:"not-started",design:"not-started",eng:"not-started"},estNum:"",estUnit:"days",note:"",owners:[],tasks:[],labelId:null}]}:s)})),[upd]);
+  const updateSprint = useCallback((sid,ch)=>upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,...ch}:s)})),[upd]);
+  const deleteSprint = useCallback(sid=>upd(p=>({...p,sprints:p.sprints.filter(s=>s.id!==sid)})),[upd]);
+  const addSprint = useCallback(()=>upd(p=>({...p,sprints:[...p.sprints,{id:newId(),label:`Sprint ${58+p.sprints.length-3}`,dates:"Dates TBD",features:[]}]})),[upd]);
 
   const handleDragStart = useCallback(fid=>setDraggingId(fid),[]);
-  const handleDragEnd = useCallback(()=>{setDraggingId(null);setDropTarget(null);},[]);
+  const handleDragEnd = useCallback(()=>{ setDraggingId(null); setDropTarget(null); },[]);
   const handleDragOverCard = useCallback((sid,fid,pos)=>setDropTarget({sprintId:sid,featureId:fid,position:pos}),[]);
   const handleDragOverEmpty = useCallback(sid=>setDropTarget({sprintId:sid,featureId:null,position:"after"}),[]);
   const handleDrop = useCallback(e=>{
-    if(!editable)return; e.preventDefault(); if(!draggingId||!dropTarget)return;
-    upd(prev=>{ let moved=null; let sprints=prev.sprints.map(s=>{const f=s.features.find(f=>f.id===draggingId);if(f){moved=f;return{...s,features:s.features.filter(f=>f.id!==draggingId)};}return s;}); if(!moved)return prev;
-      sprints=sprints.map(s=>{if(s.id!==dropTarget.sprintId)return s;const feats=[...s.features];if(!dropTarget.featureId)feats.push(moved);else{const idx=feats.findIndex(f=>f.id===dropTarget.featureId);feats.splice(dropTarget.position==="before"?idx:idx+1,0,moved);}return{...s,features:feats};});
+    if(!editable) return; e.preventDefault(); if(!draggingId||!dropTarget) return;
+    upd(prev=>{
+      let moved=null;
+      let sprints=prev.sprints.map(s=>{ const f=s.features.find(f=>f.id===draggingId); if(f){ moved=f; return{...s,features:s.features.filter(f=>f.id!==draggingId)}; } return s; });
+      if(!moved) return prev;
+      sprints=sprints.map(s=>{ if(s.id!==dropTarget.sprintId) return s; const feats=[...s.features]; if(!dropTarget.featureId) feats.push(moved); else{ const idx=feats.findIndex(f=>f.id===dropTarget.featureId); feats.splice(dropTarget.position==="before"?idx:idx+1,0,moved); } return{...s,features:feats}; });
       return{...prev,sprints};
-    }); setDraggingId(null); setDropTarget(null);
+    });
+    setDraggingId(null); setDropTarget(null);
   },[draggingId,dropTarget,editable,upd]);
 
   const handleSprintDragStart = useCallback(sid=>setDraggingSprintId(sid),[]);
-  const handleSprintDragOver = useCallback((sid,e)=>{ if(!e||!e.currentTarget)return; const rect=e.currentTarget.getBoundingClientRect(); setOverSprintId(sid); setSprintDropSide(e.clientX<rect.left+rect.width/2?"left":"right"); },[]);
-  const handleSprintDragEnd = useCallback(()=>{setDraggingSprintId(null);setOverSprintId(null);setSprintDropSide(null);},[]);
+  const handleSprintDragOver = useCallback((sid,e)=>{ if(!e||!e.currentTarget) return; const rect=e.currentTarget.getBoundingClientRect(); setOverSprintId(sid); setSprintDropSide(e.clientX<rect.left+rect.width/2?"left":"right"); },[]);
+  const handleSprintDragEnd = useCallback(()=>{ setDraggingSprintId(null); setOverSprintId(null); setSprintDropSide(null); },[]);
   const handleSprintDrop = useCallback((targetId,e)=>{
-    if(!draggingSprintId||draggingSprintId===targetId)return;
+    if(!draggingSprintId||draggingSprintId===targetId) return;
     const rect=e.currentTarget.getBoundingClientRect(); const side=e.clientX<rect.left+rect.width/2?"left":"right";
     upd(prev=>{ const sprints=[...prev.sprints]; const fromIdx=sprints.findIndex(s=>s.id===draggingSprintId); const[moved]=sprints.splice(fromIdx,1); const toIdx=sprints.findIndex(s=>s.id===targetId); sprints.splice(side==="left"?toIdx:toIdx+1,0,moved); return{...prev,sprints}; });
     setDraggingSprintId(null); setOverSprintId(null); setSprintDropSide(null);
   },[draggingSprintId,upd]);
 
-  const onBoardMouseDown = e=>{ if(e.target!==boardRef.current)return; e.preventDefault(); isPanning.current=true; panStart.current={x:e.clientX,y:e.clientY,scrollX:boardRef.current.scrollLeft,scrollY:window.scrollY}; boardRef.current.style.cursor="grabbing"; boardRef.current.style.userSelect="none"; document.body.style.userSelect="none"; };
-  const onBoardMouseMove = e=>{ if(!isPanning.current)return; e.preventDefault(); const dx=e.clientX-panStart.current.x; const dy=e.clientY-panStart.current.y; boardRef.current.scrollLeft=panStart.current.scrollX-dx; window.scrollTo(0,panStart.current.scrollY-dy); };
-  const onBoardMouseUp = e=>{ if(!isPanning.current)return; isPanning.current=false; boardRef.current.style.userSelect=""; document.body.style.userSelect=""; if(boardRef.current)boardRef.current.style.cursor=(e&&e.target===boardRef.current)?"grab":"default"; };
-  const onBoardMouseOverCard = e=>{ if(!boardRef.current||isPanning.current)return; boardRef.current.style.cursor=e.target===boardRef.current?"grab":"default"; };
-  const copyPublicLink = ()=>{ const url=`${window.location.origin}${window.location.pathname}?view=public`; navigator.clipboard.writeText(url).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);}); };
+  const onBoardMouseDown = e=>{ if(e.target!==boardRef.current) return; e.preventDefault(); isPanning.current=true; panStart.current={x:e.clientX,y:e.clientY,scrollX:boardRef.current.scrollLeft,scrollY:window.scrollY}; boardRef.current.style.cursor="grabbing"; boardRef.current.style.userSelect="none"; document.body.style.userSelect="none"; };
+  const onBoardMouseMove = e=>{ if(!isPanning.current) return; e.preventDefault(); const dx=e.clientX-panStart.current.x; const dy=e.clientY-panStart.current.y; boardRef.current.scrollLeft=panStart.current.scrollX-dx; window.scrollTo(0,panStart.current.scrollY-dy); };
+  const onBoardMouseUp = e=>{ if(!isPanning.current) return; isPanning.current=false; boardRef.current.style.userSelect=""; document.body.style.userSelect=""; if(boardRef.current) boardRef.current.style.cursor=(e&&e.target===boardRef.current)?"grab":"default"; };
+  const onBoardMouseOverCard = e=>{ if(!boardRef.current||isPanning.current) return; boardRef.current.style.cursor=e.target===boardRef.current?"grab":"default"; };
+  const copyPublicLink = ()=>{ const url=`${window.location.origin}${window.location.pathname}?view=public`; navigator.clipboard.writeText(url).then(()=>{ setCopied(true); setTimeout(()=>setCopied(false),2000); }); };
 
-  if (!data) return <div style={{background:T.bg,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:T.text5,fontFamily:"system-ui"}}>Loading roadmap…</div>;
+  if(!data) return <div style={{background:T.bg,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:T.text5,fontFamily:"system-ui"}}>Loading roadmap…</div>;
 
-  const filtered={...data,sprints:data.sprints.map(s=>({...s,features:s.features.filter(f=>{ if(filter==="xl-l")return f.size==="XL"||f.size==="L"; if(filter==="m-s")return f.size==="M"||f.size==="S"; return true; })}))};
+  const filtered={...data,sprints:data.sprints.map(s=>({...s,features:s.features.filter(f=>{ if(filter==="xl-l") return f.size==="XL"||f.size==="L"; if(filter==="m-s") return f.size==="M"||f.size==="S"; return true; })}))};
   const fBtn=(v,l)=><button key={v} onClick={()=>setFilter(v)} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:"0.5px solid",background:filter===v?T.bg5:"transparent",color:filter===v?T.text:T.text5,borderColor:filter===v?T.border3:T.border}}>{l}</button>;
   const statusColor=saveStatus==="saved"?"#4ade80":saveStatus==="saving"?"#fbbf24":"transparent";
   const statusText=saveStatus==="saved"?"✓ Saved":saveStatus==="saving"?"Saving…":"";
-  const LABEL_BAR_H = 42;
+  const LABEL_BAR_H=42;
 
   return (
-    <div onDragOver={e=>{ if(editable)e.preventDefault(); }} onDrop={handleDrop}
+    <div onDragOver={e=>{ if(editable) e.preventDefault(); }} onDrop={handleDrop}
       style={{background:T.bg,minHeight:"100vh",fontFamily:"system-ui,sans-serif",boxSizing:"border-box"}}>
       <LabelBar labels={labels} onAdd={addLabel} onUpdate={updateLabel} onDelete={deleteLabel} editable={editable} darkMode={darkMode} T={T}/>
-      <div style={{paddingTop:LABEL_BAR_H+16,padding:`${LABEL_BAR_H+16}px 0 0`}}>
+      <div style={{padding:`${LABEL_BAR_H+16}px 0 0`}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:8,padding:"0 16px"}}>
           <h1 style={{fontSize:20,fontWeight:700,color:T.text,margin:0}}>Roadmap</h1>
           <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
@@ -682,15 +708,13 @@ export default function App() {
         <div style={{fontSize:10,color:T.text6,marginBottom:14,padding:"0 16px"}}>
           {isPublic?"Public view — read only":editable?"Drag ⠿ to reposition · Click size to change · Click phase to advance · Click text to edit":filter==="all"?"View mode — click Edit to make changes":"View only"}
         </div>
-        <div ref={boardRef} onMouseDown={onBoardMouseDown} onMouseMove={e=>{onBoardMouseMove(e);onBoardMouseOverCard(e);}} onMouseUp={onBoardMouseUp} onMouseLeave={onBoardMouseUp}
+        <div ref={boardRef} onMouseDown={onBoardMouseDown} onMouseMove={e=>{ onBoardMouseMove(e); onBoardMouseOverCard(e); }} onMouseUp={onBoardMouseUp} onMouseLeave={onBoardMouseUp}
           style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16,paddingLeft:16,paddingRight:16,cursor:"grab"}}>
           {filtered.sprints.map(s=>(
             <SprintCol key={s.id} sprint={s} onUpdateFeature={updateFeature} onDeleteFeature={deleteFeature} onAddFeature={addFeature} onUpdateSprint={updateSprint} onDeleteSprint={deleteSprint} onDragStart={handleDragStart} onDragEnd={handleDragEnd} draggingId={draggingId} dropTarget={dropTarget} onDragOverCard={handleDragOverCard} onDragOverEmpty={handleDragOverEmpty} editable={editable} onSprintDragStart={handleSprintDragStart} onSprintDragOver={handleSprintDragOver} onSprintDrop={handleSprintDrop} onSprintDragEnd={handleSprintDragEnd} isSprintDragging={draggingSprintId===s.id} colWidth={colWidth} isPublic={isPublic} isSprintDropTarget={overSprintId===s.id} sprintDropSide={sprintDropSide} T={T} darkMode={darkMode} labels={labels}/>
           ))}
         </div>
       </div>
-
-      {/* Floating sticky notes — bottom-right corner, collapsible */}
       <StickyNotes notes={stickyNotes} onAdd={addSticky} onUpdate={updateSticky} onDelete={deleteSticky} editable={editable} darkMode={darkMode} T={T}/>
     </div>
   );
