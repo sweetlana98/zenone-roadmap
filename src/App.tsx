@@ -469,7 +469,25 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
       <div draggable={editable&&dragging}
         onDragStart={editable&&dragging?e=>{ e.dataTransfer.effectAllowed="move"; e.stopPropagation(); onDragStart(feature.id); }:e=>e.preventDefault()}
         onDragEnd={editable?()=>{ onDragEnd(); setDragging(false); }:undefined}
-        style={{background:T.bg3,border:`${feature.phases.eng!=="not-started"?"2px":"0.5px"} solid ${bc}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:darkMode?"0 1px 3px rgba(0,0,0,.4)":"0 1px 4px rgba(0,0,0,.08)"}}>
+        style={{background:T.bg3,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,
+          boxShadow: feature.phases.eng==="done"
+            ? "0 0 0 2px #166534, 4px 0 0 0 #4ade80"
+            : feature.phases.eng==="in-progress"
+            ? "0 0 0 2px #854d0e, 4px 0 0 0 #fbbf24"
+            : `0 0 0 0.5px ${T.border}`,
+          borderLeft: feature.phases.eng==="done" ? "5px solid #4ade80"
+            : feature.phases.eng==="in-progress" ? "5px solid #fbbf24"
+            : `0.5px solid ${T.border}`,
+          borderTop: feature.phases.eng==="done" ? "2px solid #166534"
+            : feature.phases.eng==="in-progress" ? "2px solid #854d0e"
+            : `0.5px solid ${T.border}`,
+          borderRight: feature.phases.eng==="done" ? "2px solid #166534"
+            : feature.phases.eng==="in-progress" ? "2px solid #854d0e"
+            : `0.5px solid ${T.border}`,
+          borderBottom: feature.phases.eng==="done" ? "2px solid #166534"
+            : feature.phases.eng==="in-progress" ? "2px solid #854d0e"
+            : `0.5px solid ${T.border}`,
+        }}>
         {/* Header — label-tinted */}
         <div style={{background:headerBg,padding:"9px 10px"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
