@@ -248,6 +248,31 @@ function LabelPicker({ labelId, onChange, labels, editable }) {
   );
 }
 
+function LabelNameEdit({ labelId, value, onChange, editable, color, T }) {
+  const [editing, setEditing] = useState(false);
+  const [val, setVal] = useState(value);
+  // Hard reset whenever labelId changes (new label mounted at this position)
+  const prevId = useRef(labelId);
+  if (prevId.current !== labelId) {
+    prevId.current = labelId;
+    setEditing(false);
+    setVal(value);
+  }
+  const commit = () => { setEditing(false); if (val !== value) onChange(val); };
+  if (!editable || !editing) return (
+    <span onClick={editable ? e => { e.stopPropagation(); setEditing(true); } : undefined}
+      style={{fontSize:11,fontWeight:500,color,minWidth:30,maxWidth:120,cursor:editable?"text":"default"}}>
+      {value}
+    </span>
+  );
+  return (
+    <input autoFocus value={val} onChange={e => setVal(e.target.value)} onBlur={commit}
+      onKeyDown={e => { if(e.key==="Enter") commit(); if(e.key==="Escape") { setEditing(false); setVal(value); } e.stopPropagation(); }}
+      onClick={e => e.stopPropagation()}
+      style={{background:T.inputBg,border:`0.5px solid ${T.inputBorder}`,borderRadius:4,color:T.text,fontSize:11,fontFamily:"inherit",padding:"1px 5px",outline:"none",width:90}}/>
+  );
+}
+
 function LabelBar({ labels, onAdd, onUpdate, onDelete, editable, darkMode, T }) {
   const [confirmDel, setConfirmDel] = useState(null);
   const [colorPickOpen, setColorPickOpen] = useState(null);
@@ -276,8 +301,7 @@ function LabelBar({ labels, onAdd, onUpdate, onDelete, editable, darkMode, T }) 
               </div>
             )}
             {!editable && <span style={{width:10,height:10,borderRadius:"50%",background:lc.bg,display:"inline-block",flexShrink:0}}/>}
-            <InlineEdit key={l.id} value={l.name} onChange={v=>onUpdate(l.id,{name:v})} editable={editable}
-              style={{fontSize:11,fontWeight:500,color:darkMode?"#fff":lc.bg,minWidth:30,maxWidth:120}} T={T}/>
+            <LabelNameEdit key={l.id} labelId={l.id} value={l.name} onChange={v=>onUpdate(l.id,{name:v})} editable={editable} color={darkMode?"#fff":lc.bg} T={T}/>
             {editable && (
               <span onClick={()=>setConfirmDel(confirmDel===l.id?null:l.id)} style={{fontSize:10,color:darkMode?"rgba(255,255,255,0.5)":lc.bg,cursor:"pointer",marginLeft:2,opacity:.7}}>✕</span>
             )}
