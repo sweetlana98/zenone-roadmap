@@ -407,7 +407,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
   const cardLabel = labels.find(l => l.id === cardLabelId);
   const cardLc = cardLabel ? LABEL_COLORS.find(c => c.id === cardLabel.colorId) || LABEL_COLORS[0] : null;
   const headerBg = cardLc ? (darkMode ? `rgba(${parseInt(cardLc.bg.slice(1,3),16)},${parseInt(cardLc.bg.slice(3,5),16)},${parseInt(cardLc.bg.slice(5,7),16)},0.22)` : cardLc.light) : T.bg4;
-  const headerBorder = cardLc ? cardLc.bg : bc;
+  const headerBorder = bc;
 
   return (
     <div ref={cardRef} onDragOver={onDragOv}>
@@ -464,7 +464,6 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
                     <span style={{flex:1,fontSize:11,color:task.done?T.text4:T.text3,lineHeight:1.5,textDecoration:task.done?"line-through":"none",opacity:task.done?0.6:1,textAlign:"left",wordBreak:"break-word",whiteSpace:"normal"}}>{task.name||<span style={{opacity:.3}}>Task description</span>}</span>
                   )}
                   <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:1}}>
-                    <LabelPicker labelId={task.labelId} onChange={v=>updateTask(task.id,{labelId:v})} labels={labels} editable={editable&&!isPublic}/>
                     <JiraTag ticketId={task.jiraId} onChange={v=>updateTask(task.id,{jiraId:v})} editable={editable}/>
                     <OwnersPicker owners={task.owners||[]} onChange={v=>updateTask(task.id,{owners:v})} editable={editable} T={T}/>
                     {editable && <div style={{position:"relative",flexShrink:0}}>
