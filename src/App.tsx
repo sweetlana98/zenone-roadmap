@@ -273,50 +273,55 @@ function LabelNameEdit({ labelId, value, onChange, editable, color, T }) {
   );
 }
 
+function LabelChip({ l, onUpdate, onDelete, editable, darkMode, T }) {
+  const [confirmDel, setConfirmDel] = useState(false);
+  const [colorPickOpen, setColorPickOpen] = useState(false);
+  const ref = useRef();
+  useClickOutside(ref, () => { setConfirmDel(false); setColorPickOpen(false); });
+  const lc = LABEL_COLORS.find(c => c.id === l.colorId) || LABEL_COLORS[0];
+
+  return (
+    <div ref={ref} style={{display:"flex",alignItems:"center",gap:4,background:darkMode?lc.bg:lc.light,border:`1.5px solid ${lc.bg}`,borderRadius:8,padding:"3px 8px 3px 6px",position:"relative"}}>
+      {editable && (
+        <div style={{position:"relative"}}>
+          <span onClick={e=>{ e.stopPropagation(); setColorPickOpen(o=>!o); }}
+            style={{width:10,height:10,borderRadius:"50%",background:lc.bg,border:"1.5px solid rgba(255,255,255,0.5)",cursor:"pointer",display:"inline-block",flexShrink:0}}/>
+          {colorPickOpen && (
+            <div style={{position:"fixed",background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:8,zIndex:10000,display:"flex",gap:6,flexWrap:"wrap",width:176,boxShadow:"0 8px 24px rgba(0,0,0,.8)"}}
+              ref={r=>{ if(r&&ref.current){const rc=ref.current.getBoundingClientRect();r.style.top=(rc.bottom+6)+"px";r.style.left=rc.left+"px";}}}>
+              {LABEL_COLORS.map(c=>(
+                <span key={c.id} onClick={()=>{ onUpdate(l.id,{colorId:c.id}); setColorPickOpen(false); }}
+                  style={{width:20,height:20,borderRadius:"50%",background:c.bg,cursor:"pointer",border:l.colorId===c.id?"3px solid white":"2px solid transparent",boxSizing:"border-box"}} title={c.id}/>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {!editable && <span style={{width:10,height:10,borderRadius:"50%",background:lc.bg,display:"inline-block",flexShrink:0}}/>}
+      <LabelNameEdit key={l.id} labelId={l.id} value={l.name} onChange={v=>onUpdate(l.id,{name:v})} editable={editable} color={darkMode?"#fff":lc.bg} T={T}/>
+      {editable && (
+        <span onClick={()=>setConfirmDel(d=>!d)} style={{fontSize:10,color:darkMode?"rgba(255,255,255,0.5)":lc.bg,cursor:"pointer",marginLeft:2,opacity:.7}}>✕</span>
+      )}
+      {confirmDel && (
+        <div style={{position:"absolute",top:28,left:0,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:120,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
+          <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete label?</span>
+          <div style={{display:"flex",gap:6}}>
+            <button onClick={()=>{ onDelete(l.id); setConfirmDel(false); }} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
+            <button onClick={()=>setConfirmDel(false)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function LabelBar({ labels, onAdd, onUpdate, onDelete, editable, darkMode, T }) {
-  const [confirmDel, setConfirmDel] = useState(null);
-  const [colorPickOpen, setColorPickOpen] = useState(null);
-  const colorRef = useRef();
-  useClickOutside(colorRef, () => setColorPickOpen(null));
   return (
     <div style={{position:"fixed",top:0,left:0,right:0,zIndex:1000,background:darkMode?"rgba(15,15,15,0.95)":"rgba(245,245,244,0.95)",backdropFilter:"blur(8px)",borderBottom:`0.5px solid ${T.border}`,padding:"8px 16px",display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
       <span style={{fontSize:10,fontWeight:500,color:T.text4,whiteSpace:"nowrap"}}>Labels:</span>
-      {labels.map(l => {
-        const lc = LABEL_COLORS.find(c=>c.id===l.colorId) || LABEL_COLORS[0];
-        return (
-          <div key={l.id} style={{display:"flex",alignItems:"center",gap:4,background:darkMode?lc.bg:lc.light,border:`1.5px solid ${lc.bg}`,borderRadius:8,padding:"3px 8px 3px 6px",position:"relative"}}>
-            {editable && (
-              <div style={{position:"relative"}} ref={colorPickOpen===l.id?colorRef:undefined}>
-                <span onClick={e=>{ e.stopPropagation(); setColorPickOpen(colorPickOpen===l.id?null:l.id); }}
-                  style={{width:10,height:10,borderRadius:"50%",background:lc.bg,border:"1.5px solid rgba(255,255,255,0.5)",cursor:"pointer",display:"inline-block",flexShrink:0}}/>
-                {colorPickOpen===l.id && (
-                  <div style={{position:"fixed",background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:8,zIndex:10000,display:"flex",gap:6,flexWrap:"wrap",width:176,boxShadow:"0 8px 24px rgba(0,0,0,.8)"}}
-                    ref={r=>{ if(r){const el=document.activeElement;const rc=colorRef.current?.getBoundingClientRect();if(rc){r.style.top=(rc.bottom+6)+"px";r.style.left=rc.left+"px";}}}}>
-                    {LABEL_COLORS.map(c=>(
-                      <span key={c.id} onClick={()=>{ onUpdate(l.id,{colorId:c.id}); setColorPickOpen(null); }}
-                        style={{width:20,height:20,borderRadius:"50%",background:c.bg,cursor:"pointer",border:l.colorId===c.id?"3px solid white":"2px solid transparent",boxSizing:"border-box"}} title={c.id}/>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-            {!editable && <span style={{width:10,height:10,borderRadius:"50%",background:lc.bg,display:"inline-block",flexShrink:0}}/>}
-            <LabelNameEdit key={l.id} labelId={l.id} value={l.name} onChange={v=>onUpdate(l.id,{name:v})} editable={editable} color={darkMode?"#fff":lc.bg} T={T}/>
-            {editable && (
-              <span onClick={()=>setConfirmDel(confirmDel===l.id?null:l.id)} style={{fontSize:10,color:darkMode?"rgba(255,255,255,0.5)":lc.bg,cursor:"pointer",marginLeft:2,opacity:.7}}>✕</span>
-            )}
-            {confirmDel===l.id && (
-              <div style={{position:"absolute",top:28,left:0,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:120,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
-                <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete label?</span>
-                <div style={{display:"flex",gap:6}}>
-                  <button onClick={()=>{ onDelete(l.id); setConfirmDel(null); }} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
-                  <button onClick={()=>setConfirmDel(null)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      })}
+      {labels.map(l => (
+        <LabelChip key={l.id} l={l} onUpdate={onUpdate} onDelete={onDelete} editable={editable} darkMode={darkMode} T={T}/>
+      ))}
       {editable && (
         <button onClick={onAdd} style={{fontSize:11,padding:"3px 10px",borderRadius:8,border:`0.5px dashed ${T.border2}`,background:"transparent",color:T.text5,cursor:"pointer"}}>+ Add label</button>
       )}
