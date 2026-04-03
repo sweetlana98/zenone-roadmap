@@ -44,22 +44,22 @@ let OWNER_COLORS = {
 };
 
 const LABEL_COLORS = [
-  { id:"green",   bg:"#4a7c59", light:"#d4ead9", border:"#91c4a0", muted:"rgba(74,124,89,0.18)"   },
-  { id:"blue",    bg:"#3d6fa8", light:"#d0e4f7", border:"#8ab8e8", muted:"rgba(61,111,168,0.18)"  },
-  { id:"purple",  bg:"#7059a8", light:"#e5dff7", border:"#b5a8e0", muted:"rgba(112,89,168,0.18)"  },
-  { id:"amber",   bg:"#a07830", light:"#f5e8c8", border:"#d4b878", muted:"rgba(160,120,48,0.18)"  },
-  { id:"red",     bg:"#a05050", light:"#f5d8d8", border:"#d49090", muted:"rgba(160,80,80,0.18)"   },
-  { id:"pink",    bg:"#a0507a", light:"#f5d8ea", border:"#d490b8", muted:"rgba(160,80,122,0.18)"  },
-  { id:"teal",    bg:"#3a8a80", light:"#c8ecea", border:"#80ccc8", muted:"rgba(58,138,128,0.18)"  },
-  { id:"orange",  bg:"#a06038", light:"#f5e0cc", border:"#d4a880", muted:"rgba(160,96,56,0.18)"   },
-  { id:"slate",   bg:"#506880", light:"#d8e4f0", border:"#90aac8", muted:"rgba(80,104,128,0.18)"  },
-  { id:"rose",    bg:"#a05868", light:"#f5d8de", border:"#d498a8", muted:"rgba(160,88,104,0.18)"  },
-  { id:"indigo",  bg:"#4858a8", light:"#d8dcf5", border:"#98a8e0", muted:"rgba(72,88,168,0.18)"   },
-  { id:"lime",    bg:"#5a8038", light:"#ddeec8", border:"#a0cc80", muted:"rgba(90,128,56,0.18)"   },
-  { id:"cyan",    bg:"#2a7890", light:"#c8e8f0", border:"#70bcd0", muted:"rgba(42,120,144,0.18)"  },
-  { id:"fuchsia", bg:"#885098", light:"#f0d8f5", border:"#cc90e0", muted:"rgba(136,80,152,0.18)"  },
-  { id:"brown",   bg:"#7a5040", light:"#ead8d0", border:"#c0988a", muted:"rgba(122,80,64,0.18)"   },
-  { id:"stone",   bg:"#6a6458", light:"#e5e2da", border:"#b0a898", muted:"rgba(106,100,88,0.18)"  },
+  { id:"green",   bg:"#4a7c59", light:"#d4ead9", border:"#91c4a0" },
+  { id:"blue",    bg:"#3d6fa8", light:"#d0e4f7", border:"#8ab8e8" },
+  { id:"purple",  bg:"#7059a8", light:"#e5dff7", border:"#b5a8e0" },
+  { id:"amber",   bg:"#a07830", light:"#f5e8c8", border:"#d4b878" },
+  { id:"red",     bg:"#a05050", light:"#f5d8d8", border:"#d49090" },
+  { id:"pink",    bg:"#a0507a", light:"#f5d8ea", border:"#d490b8" },
+  { id:"teal",    bg:"#3a8a80", light:"#c8ecea", border:"#80ccc8" },
+  { id:"orange",  bg:"#a06038", light:"#f5e0cc", border:"#d4a880" },
+  { id:"slate",   bg:"#506880", light:"#d8e4f0", border:"#90aac8" },
+  { id:"rose",    bg:"#a05868", light:"#f5d8de", border:"#d498a8" },
+  { id:"indigo",  bg:"#4858a8", light:"#d8dcf5", border:"#98a8e0" },
+  { id:"lime",    bg:"#5a8038", light:"#ddeec8", border:"#a0cc80" },
+  { id:"cyan",    bg:"#2a7890", light:"#c8e8f0", border:"#70bcd0" },
+  { id:"fuchsia", bg:"#885098", light:"#f0d8f5", border:"#cc90e0" },
+  { id:"brown",   bg:"#7a5040", light:"#ead8d0", border:"#c0988a" },
+  { id:"stone",   bg:"#6a6458", light:"#e5e2da", border:"#b0a898" },
 ];
 
 const STICKY_COLORS = ["#fef08a","#86efac","#93c5fd","#f9a8d4","#fdba74","#c4b5fd"];
@@ -71,20 +71,6 @@ let uid = Date.now();
 const newId = () => `n${uid++}`;
 
 function useClickOutside(ref, cb) {
-  useEffect(() => {
-    const h = e => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
-        // Don't intercept if user is typing in an input/textarea
-        const tag = document.activeElement?.tagName;
-        if (tag === "INPUT" || tag === "TEXTAREA") return;
-        e.preventDefault();
-        undo();
-      }
-    };
-    document.addEventListener("keydown", h);
-    return () => document.removeEventListener("keydown", h);
-  }, [undo]);
-
   useEffect(() => {
     const h = e => { if (ref.current && !ref.current.contains(e.target)) cb(); };
     document.addEventListener("mousedown", h);
@@ -137,7 +123,6 @@ function InlineEdit({ value, onChange, style={}, placeholder="Edit…", editable
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(value);
   const prevValueRef = useRef(value);
-  // Sync external value changes without waiting for useEffect (prevents stale-value bleed)
   if (!editing && prevValueRef.current !== value) {
     prevValueRef.current = value;
     setVal(value);
@@ -234,11 +219,8 @@ function LabelPicker({ labelId, onChange, labels, editable }) {
   useClickOutside(ref, () => setOpen(false));
   const current = labels.find(l=>l.id===labelId);
   const lc = current ? LABEL_COLORS.find(c=>c.id===current.colorId) : null;
-
   if (!editable && !current) return null;
-  if (!editable && current) return (
-    <span style={{width:10,height:10,borderRadius:"50%",background:lc?lc.bg:"#888",flexShrink:0,display:"inline-block"}} title={current.name}/>
-  );
+  if (!editable && current) return <span style={{width:10,height:10,borderRadius:"50%",background:lc?lc.bg:"#888",flexShrink:0,display:"inline-block"}} title={current.name}/>;
   return (
     <div ref={ref} style={{position:"relative",flexShrink:0}}>
       <span onClick={e=>{ e.stopPropagation(); setOpen(o=>!o); }} title="Assign label"
@@ -265,13 +247,8 @@ function LabelPicker({ labelId, onChange, labels, editable }) {
 function LabelNameEdit({ labelId, value, onChange, editable, color, T }) {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(value);
-  // Hard reset whenever labelId changes (new label mounted at this position)
   const prevId = useRef(labelId);
-  if (prevId.current !== labelId) {
-    prevId.current = labelId;
-    setEditing(false);
-    setVal(value);
-  }
+  if (prevId.current !== labelId) { prevId.current = labelId; setEditing(false); setVal(value); }
   const commit = () => { setEditing(false); if (val !== value) onChange(val); };
   if (!editable || !editing) return (
     <span onClick={editable ? e => { e.stopPropagation(); setEditing(true); } : undefined}
@@ -280,9 +257,9 @@ function LabelNameEdit({ labelId, value, onChange, editable, color, T }) {
     </span>
   );
   return (
-    <input autoFocus value={val} onChange={e => setVal(e.target.value)} onBlur={commit}
-      onKeyDown={e => { if(e.key==="Enter") commit(); if(e.key==="Escape") { setEditing(false); setVal(value); } e.stopPropagation(); }}
-      onClick={e => e.stopPropagation()}
+    <input autoFocus value={val} onChange={e=>setVal(e.target.value)} onBlur={commit}
+      onKeyDown={e=>{ if(e.key==="Enter")commit(); if(e.key==="Escape"){setEditing(false);setVal(value);} e.stopPropagation(); }}
+      onClick={e=>e.stopPropagation()}
       style={{background:T.inputBg,border:`0.5px solid ${T.inputBorder}`,borderRadius:4,color:T.text,fontSize:11,fontFamily:"inherit",padding:"1px 5px",outline:"none",width:90}}/>
   );
 }
@@ -292,8 +269,7 @@ function LabelChip({ l, onUpdate, onDelete, editable, darkMode, T }) {
   const [colorPickOpen, setColorPickOpen] = useState(false);
   const ref = useRef();
   useClickOutside(ref, () => { setConfirmDel(false); setColorPickOpen(false); });
-  const lc = LABEL_COLORS.find(c => c.id === l.colorId) || LABEL_COLORS[0];
-
+  const lc = LABEL_COLORS.find(c=>c.id===l.colorId) || LABEL_COLORS[0];
   return (
     <div ref={ref} style={{display:"flex",alignItems:"center",gap:4,background:darkMode?lc.bg:lc.light,border:`1.5px solid ${lc.bg}`,borderRadius:8,padding:"3px 8px 3px 6px",position:"relative"}}>
       {editable && (
@@ -305,7 +281,7 @@ function LabelChip({ l, onUpdate, onDelete, editable, darkMode, T }) {
               ref={r=>{ if(r&&ref.current){const rc=ref.current.getBoundingClientRect();r.style.top=(rc.bottom+6)+"px";r.style.left=rc.left+"px";}}}>
               {LABEL_COLORS.map(c=>(
                 <span key={c.id} onClick={()=>{ onUpdate(l.id,{colorId:c.id}); setColorPickOpen(false); }}
-                  style={{width:20,height:20,borderRadius:"50%",background:c.bg,cursor:"pointer",border:l.colorId===c.id?"3px solid white":"2px solid transparent",boxSizing:"border-box"}} title={c.id}/>
+                  style={{width:20,height:20,borderRadius:"50%",background:c.bg,cursor:"pointer",border:l.colorId===c.id?"3px solid white":"2px solid transparent",boxSizing:"border-box"}}/>
               ))}
             </div>
           )}
@@ -313,9 +289,7 @@ function LabelChip({ l, onUpdate, onDelete, editable, darkMode, T }) {
       )}
       {!editable && <span style={{width:10,height:10,borderRadius:"50%",background:lc.bg,display:"inline-block",flexShrink:0}}/>}
       <LabelNameEdit key={l.id} labelId={l.id} value={l.name} onChange={v=>onUpdate(l.id,{name:v})} editable={editable} color={darkMode?"#fff":lc.bg} T={T}/>
-      {editable && (
-        <span onClick={()=>setConfirmDel(d=>!d)} style={{fontSize:10,color:darkMode?"rgba(255,255,255,0.5)":lc.bg,cursor:"pointer",marginLeft:2,opacity:.7}}>✕</span>
-      )}
+      {editable && <span onClick={()=>setConfirmDel(d=>!d)} style={{fontSize:10,color:darkMode?"rgba(255,255,255,0.5)":lc.bg,cursor:"pointer",marginLeft:2,opacity:.7}}>✕</span>}
       {confirmDel && (
         <div style={{position:"absolute",top:28,left:0,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:120,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
           <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete label?</span>
@@ -333,12 +307,8 @@ function LabelBar({ labels, onAdd, onUpdate, onDelete, editable, darkMode, T }) 
   return (
     <div style={{position:"fixed",top:0,left:0,right:0,zIndex:1000,background:darkMode?"rgba(15,15,15,0.95)":"rgba(245,245,244,0.95)",backdropFilter:"blur(8px)",borderBottom:`0.5px solid ${T.border}`,padding:"8px 16px",display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
       <span style={{fontSize:10,fontWeight:500,color:T.text4,whiteSpace:"nowrap"}}>Labels:</span>
-      {labels.map(l => (
-        <LabelChip key={l.id} l={l} onUpdate={onUpdate} onDelete={onDelete} editable={editable} darkMode={darkMode} T={T}/>
-      ))}
-      {editable && (
-        <button onClick={onAdd} style={{fontSize:11,padding:"3px 10px",borderRadius:8,border:`0.5px dashed ${T.border2}`,background:"transparent",color:T.text5,cursor:"pointer"}}>+ Add label</button>
-      )}
+      {labels.map(l=><LabelChip key={l.id} l={l} onUpdate={onUpdate} onDelete={onDelete} editable={editable} darkMode={darkMode} T={T}/>)}
+      {editable && <button onClick={onAdd} style={{fontSize:11,padding:"3px 10px",borderRadius:8,border:`0.5px dashed ${T.border2}`,background:"transparent",color:T.text5,cursor:"pointer"}}>+ Add label</button>}
     </div>
   );
 }
@@ -352,9 +322,7 @@ function StickyNotes({ notes, onAdd, onUpdate, onDelete, editable, darkMode, T }
       </button>
       {!collapsed && (
         <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"flex-end",maxHeight:"60vh",overflowY:"auto"}}>
-          {notes.map(note=>(
-            <StickyNote key={note.id} note={note} onUpdate={onUpdate} onDelete={onDelete} editable={editable} darkMode={darkMode} T={T}/>
-          ))}
+          {notes.map(note=><StickyNote key={note.id} note={note} onUpdate={onUpdate} onDelete={onDelete} editable={editable} darkMode={darkMode} T={T}/>)}
           {editable && <button onClick={onAdd} style={{background:"transparent",border:`0.5px dashed ${T.border2}`,borderRadius:8,color:T.text5,fontSize:11,padding:"5px 14px",cursor:"pointer"}}>+ Add note</button>}
           {notes.length===0&&!editable&&<div style={{fontSize:11,color:T.text5,padding:"4px 8px"}}>No notes yet</div>}
         </div>
@@ -363,7 +331,7 @@ function StickyNotes({ notes, onAdd, onUpdate, onDelete, editable, darkMode, T }
   );
 }
 
-function StickyNote({ note, onUpdate, onDelete, editable, darkMode, T }) {
+function StickyNote({ note, onUpdate, onDelete, editable }) {
   const [confirmDel, setConfirmDel] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
   const ref = useRef();
@@ -374,19 +342,16 @@ function StickyNote({ note, onUpdate, onDelete, editable, darkMode, T }) {
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
         {editable && (
           <div style={{position:"relative"}}>
-            <span onClick={()=>setColorOpen(o=>!o)} style={{width:12,height:12,borderRadius:"50%",background:bg,border:"1.5px solid rgba(0,0,0,0.2)",display:"inline-block",cursor:"pointer",flexShrink:0}}/>
+            <span onClick={()=>setColorOpen(o=>!o)} style={{width:12,height:12,borderRadius:"50%",background:bg,border:"1.5px solid rgba(0,0,0,0.2)",display:"inline-block",cursor:"pointer"}}/>
             {colorOpen && (
-              <div style={{position:"absolute",bottom:20,left:0,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:8,display:"flex",gap:5,flexWrap:"wrap",width:126,zIndex:100,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
-                {STICKY_COLORS.map(c=>(
-                  <span key={c} onClick={()=>{ onUpdate(note.id,{color:c}); setColorOpen(false); }}
-                    style={{width:20,height:20,borderRadius:"50%",background:c,cursor:"pointer",border:note.color===c?"2px solid #fff":"2px solid transparent",boxSizing:"border-box"}}/>
-                ))}
+              <div style={{position:"absolute",bottom:20,left:0,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:8,display:"flex",gap:5,flexWrap:"wrap",width:126,zIndex:100}}>
+                {STICKY_COLORS.map(c=><span key={c} onClick={()=>{ onUpdate(note.id,{color:c}); setColorOpen(false); }} style={{width:20,height:20,borderRadius:"50%",background:c,cursor:"pointer",border:note.color===c?"2px solid #fff":"2px solid transparent",boxSizing:"border-box"}}/>)}
               </div>
             )}
           </div>
         )}
         <div style={{display:"flex",gap:4,alignItems:"center",marginLeft:"auto"}}>
-          {editable&&!confirmDel&&<span onClick={()=>setConfirmDel(true)} style={{fontSize:10,color:"rgba(0,0,0,0.35)",cursor:"pointer",lineHeight:1}}>✕</span>}
+          {editable&&!confirmDel&&<span onClick={()=>setConfirmDel(true)} style={{fontSize:10,color:"rgba(0,0,0,0.35)",cursor:"pointer"}}>✕</span>}
           {confirmDel&&<span style={{display:"flex",gap:4,alignItems:"center"}}>
             <span style={{fontSize:10,color:"rgba(0,0,0,0.6)"}}>Delete?</span>
             <span onClick={()=>onDelete(note.id)} style={{fontSize:10,color:"#dc2626",cursor:"pointer",fontWeight:600}}>Yes</span>
@@ -395,8 +360,7 @@ function StickyNote({ note, onUpdate, onDelete, editable, darkMode, T }) {
         </div>
       </div>
       {editable
-        ? <textarea value={note.text} onChange={e=>onUpdate(note.id,{text:e.target.value})} placeholder="Write a note…" rows={3}
-            style={{width:"100%",background:"transparent",border:"none",outline:"none",resize:"vertical",fontSize:12,color:"rgba(0,0,0,0.75)",fontFamily:"system-ui,sans-serif",lineHeight:1.5,padding:0,boxSizing:"border-box"}}/>
+        ? <textarea value={note.text} onChange={e=>onUpdate(note.id,{text:e.target.value})} placeholder="Write a note…" rows={3} style={{width:"100%",background:"transparent",border:"none",outline:"none",resize:"vertical",fontSize:12,color:"rgba(0,0,0,0.75)",fontFamily:"system-ui,sans-serif",lineHeight:1.5,padding:0,boxSizing:"border-box"}}/>
         : <div style={{fontSize:12,color:"rgba(0,0,0,0.75)",lineHeight:1.5,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>{note.text||<span style={{opacity:.4}}>Empty note</span>}</div>
       }
     </div>
@@ -407,13 +371,12 @@ function DropIndicator() {
   return <div style={{height:3,background:"#4ade80",borderRadius:2,margin:"2px 0"}}/>;
 }
 
-// Local-state textarea — only commits to parent on blur/Enter, preventing cross-card re-renders
 function TaskTextarea({ value, onCommit, T }) {
   const [local, setLocal] = useState(value);
   const taRef = useRef();
-  useEffect(()=>{ setLocal(value); },[value]);
+  useEffect(()=>setLocal(value),[value]);
   const resize = el => { if(el){ el.style.height="auto"; el.style.height=el.scrollHeight+"px"; } };
-  useEffect(()=>{ resize(taRef.current); },[local]);
+  useEffect(()=>resize(taRef.current),[local]);
   return (
     <textarea ref={r=>{ taRef.current=r; resize(r); }} value={local}
       onChange={e=>{ setLocal(e.target.value); resize(e.target); }}
@@ -435,7 +398,6 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
   const delRef = useRef();
   useClickOutside(delRef, ()=>setConfirmDel(false));
 
-  // Always-fresh ref so callbacks never go stale
   const featureRef = useRef(feature);
   useEffect(()=>{ featureRef.current=feature; },[feature]);
 
@@ -465,10 +427,13 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
     onDragOverCard(feature.id, e.clientY<r.top+r.height/2?"before":"after");
   };
 
-  // Eng-state border color
-  const bc = feature.phases.eng==="done"?"#166534":feature.phases.eng==="in-progress"?"#854d0e":T.border;
+  const engState = feature.phases.eng;
+  const cardBoxShadow = engState==="done"
+    ? "-3px 0 0 0 #4ade80, 3px 0 0 0 #4ade80"
+    : engState==="in-progress"
+    ? "-3px 0 0 0 #fbbf24, 3px 0 0 0 #fbbf24"
+    : darkMode ? "0 1px 3px rgba(0,0,0,.4)" : "0 1px 4px rgba(0,0,0,.08)";
 
-  // Label wash for card header background only
   const cardLabel = labels.find(l=>l.id===feature.labelId);
   const cardLc = cardLabel ? LABEL_COLORS.find(c=>c.id===cardLabel.colorId)||LABEL_COLORS[0] : null;
   const headerBg = cardLc
@@ -483,15 +448,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
       <div draggable={editable&&dragging}
         onDragStart={editable&&dragging?e=>{ e.dataTransfer.effectAllowed="move"; e.stopPropagation(); onDragStart(feature.id); }:e=>e.preventDefault()}
         onDragEnd={editable?()=>{ onDragEnd(); setDragging(false); }:undefined}
-        style={{background:T.bg3,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,
-          border:`0.5px solid ${T.border}`,
-          boxShadow: feature.phases.eng==="done"
-            ? "-3px 0 0 0 #4ade80, 3px 0 0 0 #4ade80"
-            : feature.phases.eng==="in-progress"
-            ? "-3px 0 0 0 #fbbf24, 3px 0 0 0 #fbbf24"
-            : darkMode ? "0 1px 3px rgba(0,0,0,.4)" : "0 1px 4px rgba(0,0,0,.08)",
-        }}>
-        {/* Header — label-tinted */}
+        style={{background:T.bg3,border:`0.5px solid ${T.border}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:cardBoxShadow}}>
         <div style={{background:headerBg,padding:"9px 10px"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
             {editable && <span onMouseDown={e=>{ e.stopPropagation(); setDragging(true); }} onMouseUp={()=>setDragging(false)} onMouseLeave={()=>setDragging(false)} style={{color:T.text5,fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
@@ -636,8 +593,8 @@ export default function App() {
   const [sprintDropSide, setSprintDropSide] = useState(null);
   const [copied, setCopied] = useState(false);
   const [darkMode, setDarkMode] = useState(()=>{ try{ return localStorage.getItem("darkMode")!=="false"; }catch{ return true; } });
-  const history = useRef([]);
   const saveTimer = useRef(null);
+  const history = useRef([]);
   const boardRef = useRef(null);
   const isPanning = useRef(false);
   const panStart = useRef({x:0,y:0,scrollX:0,scrollY:0});
@@ -649,17 +606,7 @@ export default function App() {
   const labels = data?.labels||[];
   const stickyNotes = data?.stickyNotes||[];
 
-  const updLabels = fn => upd(p=>({...p,labels:fn(p.labels||[])}));
-  const addLabel = () => updLabels(ls=>[...ls,{id:newId(),name:"New label",colorId:LABEL_COLORS[ls.length%LABEL_COLORS.length].id}]);
-  const updateLabel = (id,ch) => updLabels(ls=>ls.map(l=>l.id===id?{...l,...ch}:l));
-  const deleteLabel = id => updLabels(ls=>ls.filter(l=>l.id!==id));
-
-  const updStickies = fn => upd(p=>({...p,stickyNotes:fn(p.stickyNotes||[])}));
-  const addSticky = () => updStickies(ns=>[...ns,{id:newId(),text:"",color:STICKY_COLORS[ns.length%STICKY_COLORS.length]}]);
-  const updateSticky = (id,ch) => updStickies(ns=>ns.map(n=>n.id===id?{...n,...ch}:n));
-  const deleteSticky = id => updStickies(ns=>ns.filter(n=>n.id!==id));
-
-  const toggleDark = () => { setDarkMode(d=>{ const next=!d; try{localStorage.setItem("darkMode",String(next));}catch{} return next; }); };
+  const toggleDark = () => setDarkMode(d=>{ const next=!d; try{localStorage.setItem("darkMode",String(next));}catch{} return next; });
 
   useEffect(()=>{
     const bg=darkMode?DARK.bg:LIGHT.bg;
@@ -687,28 +634,48 @@ export default function App() {
     saveTimer.current=setTimeout(async()=>{ await saveData(newData); setSaveStatus("saved"); setTimeout(()=>setSaveStatus("idle"),2000); },800);
   },[]);
 
-  const upd = useCallback(fn => setData(prev => {
-    history.current = [...history.current.slice(-49), prev]; // keep last 50 states
-    const next = fn(prev);
+  const upd = useCallback(fn=>setData(prev=>{
+    history.current=[...history.current.slice(-49), prev];
+    const next=fn(prev);
     scheduleSave(next);
     return next;
-  }), [scheduleSave]);
+  }),[scheduleSave]);
 
-  const undo = useCallback(() => {
-    if (history.current.length === 0) return;
-    const prev = history.current[history.current.length - 1];
-    history.current = history.current.slice(0, -1);
+  const undo = useCallback(()=>{
+    if(history.current.length===0) return;
+    const prev=history.current[history.current.length-1];
+    history.current=history.current.slice(0,-1);
     setData(prev);
     scheduleSave(prev);
-  }, [scheduleSave]);
+  },[scheduleSave]);
 
-  const updateFeature = useCallback((fid, ch) => upd(p => ({
+  useEffect(()=>{
+    const h=e=>{
+      if((e.ctrlKey||e.metaKey)&&e.key==="z"&&!e.shiftKey){
+        const tag=document.activeElement?.tagName;
+        if(tag==="INPUT"||tag==="TEXTAREA") return;
+        e.preventDefault();
+        undo();
+      }
+    };
+    document.addEventListener("keydown",h);
+    return ()=>document.removeEventListener("keydown",h);
+  },[undo]);
+
+  const updLabels = fn=>upd(p=>({...p,labels:fn(p.labels||[])}));
+  const addLabel = ()=>updLabels(ls=>[...ls,{id:newId(),name:"New label",colorId:LABEL_COLORS[ls.length%LABEL_COLORS.length].id}]);
+  const updateLabel = (id,ch)=>updLabels(ls=>ls.map(l=>l.id===id?{...l,...ch}:l));
+  const deleteLabel = id=>updLabels(ls=>ls.filter(l=>l.id!==id));
+
+  const updStickies = fn=>upd(p=>({...p,stickyNotes:fn(p.stickyNotes||[])}));
+  const addSticky = ()=>updStickies(ns=>[...ns,{id:newId(),text:"",color:STICKY_COLORS[ns.length%STICKY_COLORS.length]}]);
+  const updateSticky = (id,ch)=>updStickies(ns=>ns.map(n=>n.id===id?{...n,...ch}:n));
+  const deleteSticky = id=>updStickies(ns=>ns.filter(n=>n.id!==id));
+
+  const updateFeature = useCallback((fid,ch)=>upd(p=>({
     ...p,
-    sprints: p.sprints.map(s => ({
-      ...s,
-      features: s.features.map(f => f.id === fid ? { ...f, ...ch } : f)
-    }))
-  })), [upd]);
+    sprints:p.sprints.map(s=>({...s,features:s.features.map(f=>f.id===fid?{...f,...ch}:f)}))
+  })),[upd]);
   const deleteFeature = useCallback(fid=>upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.filter(f=>f.id!==fid)}))})),[upd]);
   const addFeature = useCallback(sid=>upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,features:[...s.features,{id:newId(),name:"New feature",size:"M",phases:{product:"not-started",design:"not-started",eng:"not-started"},estNum:"",estUnit:"days",note:"",owners:[],tasks:[],labelId:null}]}:s)})),[upd]);
   const updateSprint = useCallback((sid,ch)=>upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,...ch}:s)})),[upd]);
@@ -776,7 +743,7 @@ export default function App() {
           </div>
         </div>
         <div style={{fontSize:10,color:T.text6,marginBottom:14,padding:"0 16px"}}>
-          {isPublic?"Public view — read only":editable?"Drag ⠿ to reposition · Click size to change · Click phase to advance · Click text to edit":filter==="all"?"View mode — click Edit to make changes":"View only"}
+          {isPublic?"Public view — read only":editable?"Drag ⠿ to reposition · Click size to change · Click phase to advance · Click text to edit · Ctrl+Z to undo":filter==="all"?"View mode — click Edit to make changes":"View only"}
         </div>
         <div ref={boardRef} onMouseDown={onBoardMouseDown} onMouseMove={e=>{ onBoardMouseMove(e); onBoardMouseOverCard(e); }} onMouseUp={onBoardMouseUp} onMouseLeave={onBoardMouseUp}
           style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16,paddingLeft:16,paddingRight:16,cursor:"grab"}}>
