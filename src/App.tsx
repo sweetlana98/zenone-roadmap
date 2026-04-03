@@ -67,10 +67,24 @@ const STICKY_COLORS = ["#fef08a","#86efac","#93c5fd","#f9a8d4","#fdba74","#c4b5f
 const DARK  = { bg:"#0f0f0f",bg2:"#141414",bg3:"#1a1a1a",bg4:"#1f1f1f",bg5:"#242424",border:"#2a2a2a",border2:"#333",border3:"#444",text:"#f0f0f0",text2:"#e0e0e0",text3:"#c0c0c0",text4:"#6b7280",text5:"#555",text6:"#333",inputBg:"#2a2a2a",inputBorder:"#555" };
 const LIGHT = { bg:"#f5f5f4",bg2:"#ffffff",bg3:"#fafaf9",bg4:"#f0efed",bg5:"#e8e8e6",border:"#d4d2cc",border2:"#c4c2bc",border3:"#b4b2ac",text:"#1c1c1a",text2:"#2c2c2a",text3:"#4c4c4a",text4:"#6c6c6a",text5:"#9c9c9a",text6:"#bbb",inputBg:"#ffffff",inputBorder:"#b4b2ac" };
 
-let uid = 2000;
+let uid = Date.now();
 const newId = () => `n${uid++}`;
 
 function useClickOutside(ref, cb) {
+  useEffect(() => {
+    const h = e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
+        // Don't intercept if user is typing in an input/textarea
+        const tag = document.activeElement?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+        e.preventDefault();
+        undo();
+      }
+    };
+    document.addEventListener("keydown", h);
+    return () => document.removeEventListener("keydown", h);
+  }, [undo]);
+
   useEffect(() => {
     const h = e => { if (ref.current && !ref.current.contains(e.target)) cb(); };
     document.addEventListener("mousedown", h);
@@ -622,6 +636,7 @@ export default function App() {
   const [sprintDropSide, setSprintDropSide] = useState(null);
   const [copied, setCopied] = useState(false);
   const [darkMode, setDarkMode] = useState(()=>{ try{ return localStorage.getItem("darkMode")!=="false"; }catch{ return true; } });
+  const history = useRef([]);
   const saveTimer = useRef(null);
   const boardRef = useRef(null);
   const isPanning = useRef(false);
@@ -672,9 +687,28 @@ export default function App() {
     saveTimer.current=setTimeout(async()=>{ await saveData(newData); setSaveStatus("saved"); setTimeout(()=>setSaveStatus("idle"),2000); },800);
   },[]);
 
-  const upd = useCallback(fn=>setData(prev=>{ const next=fn(prev); scheduleSave(next); return next; }),[scheduleSave]);
+  const upd = useCallback(fn => setData(prev => {
+    history.current = [...history.current.slice(-49), prev]; // keep last 50 states
+    const next = fn(prev);
+    scheduleSave(next);
+    return next;
+  }), [scheduleSave]);
 
-  const updateFeature = useCallback((fid,ch)=>upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.map(f=>f.id===fid?{...f,...ch}:f)}))})),[upd]);
+  const undo = useCallback(() => {
+    if (history.current.length === 0) return;
+    const prev = history.current[history.current.length - 1];
+    history.current = history.current.slice(0, -1);
+    setData(prev);
+    scheduleSave(prev);
+  }, [scheduleSave]);
+
+  const updateFeature = useCallback((fid, ch) => upd(p => ({
+    ...p,
+    sprints: p.sprints.map(s => ({
+      ...s,
+      features: s.features.map(f => f.id === fid ? { ...f, ...ch } : f)
+    }))
+  })), [upd]);
   const deleteFeature = useCallback(fid=>upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.filter(f=>f.id!==fid)}))})),[upd]);
   const addFeature = useCallback(sid=>upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,features:[...s.features,{id:newId(),name:"New feature",size:"M",phases:{product:"not-started",design:"not-started",eng:"not-started"},estNum:"",estUnit:"days",note:"",owners:[],tasks:[],labelId:null}]}:s)})),[upd]);
   const updateSprint = useCallback((sid,ch)=>upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,...ch}:s)})),[upd]);
