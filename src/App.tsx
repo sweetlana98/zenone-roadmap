@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 const SUPABASE_URL = "https://fwktaxbgicooxmqleaho.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3a3RheGJnaWNvb3htcWxlYWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NTk3ODYsImV4cCI6MjA5MDEzNTc4Nn0._YNNkQn-jmvFziFAAWQbzxKEkpebQbYBfqg110WdDYo";
 const JIRA_BASE = "https://zenone.atlassian.net/browse";
-const PASS = "zenone2025"; // ← change to your team password
+const PASS = "ZenOne2026"; // ← change to your team password
 
 async function loadData() {
   try {
