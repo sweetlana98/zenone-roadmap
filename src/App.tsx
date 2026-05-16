@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 const SUPABASE_URL = "https://fwktaxbgicooxmqleaho.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3a3RheGJnaWNvb3htcWxlYWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NTk3ODYsImV4cCI6MjA5MDEzNTc4Nn0._YNNkQn-jmvFziFAAWQbzxKEkpebQbYBfqg110WdDYo";
 const JIRA_BASE = "https://zenone.atlassian.net/browse";
-const PASS = "ZenOne2026"; // ← change to your team password
+const PASS = "ZenOne2026";
 
 async function loadData() {
   try {
@@ -313,7 +313,7 @@ function StickyNotes({ notes, onAdd, onUpdate, onDelete, editable, darkMode, T }
   return (
     <div style={{position:"fixed",bottom:16,right:16,zIndex:2000,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
       <button onClick={()=>setCollapsed(c=>!c)} style={{background:darkMode?"#1f1f1f":"#fff",border:`0.5px solid ${T.border2}`,borderRadius:20,padding:"4px 12px",fontSize:11,color:T.text4,cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,.3)",display:"flex",alignItems:"center",gap:6}}>
-        📝 {collapsed ? `Notes (${notes.length})` : "Notes ▾"}
+        📝 {collapsed?`Notes (${notes.length})`:"Notes ▾"}
       </button>
       {!collapsed && (
         <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"flex-end",maxHeight:"60vh",overflowY:"auto"}}>
@@ -364,8 +364,10 @@ function StickyNote({ note, onUpdate, onDelete, editable }) {
   );
 }
 
-function DropIndicator() {
-  return <div style={{height:3,background:"#4ade80",borderRadius:2,margin:"2px 0"}}/>;
+function DropIndicator({ horizontal }) {
+  return horizontal
+    ? <div style={{width:3,background:"#4ade80",borderRadius:2,alignSelf:"stretch",flexShrink:0}}/>
+    : <div style={{height:3,background:"#4ade80",borderRadius:2,margin:"2px 0"}}/>;
 }
 
 function TaskTextarea({ value, onCommit, T }) {
@@ -384,14 +386,30 @@ function TaskTextarea({ value, onCommit, T }) {
   );
 }
 
-function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDragging, onDragOverCard, dropPosition, editable, isPublic, T, darkMode, labels }) {
+// Ghost card shown while dragging
+function GhostCard({ feature, pos, T, darkMode, labels }) {
+  if (!feature) return null;
+  const cardLabel = labels.find(l=>l.id===feature.labelId);
+  const cardLc = cardLabel ? LABEL_COLORS.find(c=>c.id===cardLabel.colorId)||LABEL_COLORS[0] : null;
+  const headerBg = cardLc ? (darkMode ? `rgba(${parseInt(cardLc.bg.slice(1,3),16)},${parseInt(cardLc.bg.slice(3,5),16)},${parseInt(cardLc.bg.slice(5,7),16)},0.22)` : cardLc.light) : T.bg4;
+  const engState = feature.phases?.eng;
+  const shadow = engState==="done" ? "-3px 0 0 0 #4ade80,3px 0 0 0 #4ade80" : engState==="in-progress" ? "-3px 0 0 0 #fbbf24,3px 0 0 0 #fbbf24" : "0 4px 20px rgba(0,0,0,.5)";
+  return (
+    <div style={{position:"fixed",left:pos.x,top:pos.y,width:260,pointerEvents:"none",zIndex:9000,opacity:0.92,transform:"rotate(1.5deg)",boxShadow:shadow,background:T.bg3,border:`0.5px solid ${T.border}`,borderRadius:10,overflow:"hidden"}}>
+      <div style={{background:headerBg,padding:"9px 10px",display:"flex",alignItems:"center",gap:8}}>
+        <span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",background:SIZE_STYLES[feature.size]?.bg||"#333",color:"#fff",borderRadius:4,fontSize:10,fontWeight:700,minWidth:22,height:20,padding:"0 4px"}}>{feature.size}</span>
+        <span style={{fontSize:13,fontWeight:600,color:T.text,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{feature.name}</span>
+      </div>
+    </div>
+  );
+}
+
+function FeatureCard({ feature, onUpdate, onDelete, isDragging, dropPosition, editable, isPublic, T, darkMode, labels, onDragHandleMouseDown }) {
   const storageKey = `collapsed_${feature.id}`;
   const [collapsed, setCollapsed] = useState(()=>{ try{ return localStorage.getItem(storageKey)==="true"; }catch{ return false; } });
   const toggleCollapsed = ()=>{ const next=!collapsed; setCollapsed(next); try{localStorage.setItem(storageKey,String(next));}catch{}; };
   const [confirmDel, setConfirmDel] = useState(false);
   const [confirmTask, setConfirmTask] = useState(null);
-  const [dragging, setDragging] = useState(false);
-  const cardRef = useRef();
   const delRef = useRef();
   useClickOutside(delRef, ()=>setConfirmDel(false));
 
@@ -418,37 +436,30 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
     onUpdate(f.id,{tasks:f.tasks.filter(t=>t.id!==tid)});
   },[onUpdate]);
 
-  const onDragOv = e=>{
-    if(!editable) return; e.preventDefault(); e.stopPropagation();
-    const r=cardRef.current.getBoundingClientRect();
-    onDragOverCard(feature.id, e.clientY<r.top+r.height/2?"before":"after", e);
-  };
-
   const engState = feature.phases.eng;
   const cardBoxShadow = engState==="done"
-    ? "-3px 0 0 0 #4ade80, 3px 0 0 0 #4ade80"
+    ? "-3px 0 0 0 #4ade80,3px 0 0 0 #4ade80"
     : engState==="in-progress"
-    ? "-3px 0 0 0 #fbbf24, 3px 0 0 0 #fbbf24"
+    ? "-3px 0 0 0 #fbbf24,3px 0 0 0 #fbbf24"
     : darkMode ? "0 1px 3px rgba(0,0,0,.4)" : "0 1px 4px rgba(0,0,0,.08)";
 
   const cardLabel = labels.find(l=>l.id===feature.labelId);
   const cardLc = cardLabel ? LABEL_COLORS.find(c=>c.id===cardLabel.colorId)||LABEL_COLORS[0] : null;
   const headerBg = cardLc
-    ? darkMode
-      ? `rgba(${parseInt(cardLc.bg.slice(1,3),16)},${parseInt(cardLc.bg.slice(3,5),16)},${parseInt(cardLc.bg.slice(5,7),16)},0.22)`
-      : cardLc.light
+    ? darkMode ? `rgba(${parseInt(cardLc.bg.slice(1,3),16)},${parseInt(cardLc.bg.slice(3,5),16)},${parseInt(cardLc.bg.slice(5,7),16)},0.22)` : cardLc.light
     : T.bg4;
 
   return (
-    <div ref={cardRef} onDragOver={onDragOv}>
+    <div data-feature-id={feature.id} style={{marginBottom:8}}>
       {dropPosition==="before" && <DropIndicator/>}
-      <div draggable={editable&&dragging}
-        onDragStart={editable&&dragging?e=>{ e.dataTransfer.effectAllowed="move"; e.stopPropagation(); onDragStart(feature.id); }:e=>e.preventDefault()}
-        onDragEnd={editable?()=>{ onDragEnd(); setDragging(false); }:undefined}
-        style={{background:T.bg3,border:`0.5px solid ${T.border}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?0.3:1,boxShadow:cardBoxShadow}}>
+      <div style={{background:T.bg3,border:`0.5px solid ${T.border}`,borderRadius:10,overflow:"hidden",opacity:isDragging?0.25:1,boxShadow:cardBoxShadow,transition:"opacity .15s"}}>
         <div style={{background:headerBg,padding:"9px 10px"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
-            {editable && <span onMouseDown={e=>{ e.stopPropagation(); setDragging(true); }} onMouseUp={()=>setDragging(false)} onMouseLeave={()=>setDragging(false)} style={{color:T.text5,fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
+            {editable && (
+              <span
+                onMouseDown={e=>{ e.stopPropagation(); onDragHandleMouseDown(e, feature.id); }}
+                style={{color:T.text5,fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>
+            )}
             <SizeBadge size={feature.size} onChange={v=>onUpdate(feature.id,{size:v})} editable={editable}/>
             <LabelPicker labelId={feature.labelId||null} onChange={v=>onUpdate(feature.id,{labelId:v})} labels={labels} editable={editable&&!isPublic}/>
             <InlineEdit value={feature.name} onChange={v=>onUpdate(feature.id,{name:v})} editable={editable} T={T} style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,color:T.text,lineHeight:1.4,wordBreak:"break-word",whiteSpace:"normal"}}/>
@@ -541,27 +552,26 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
   );
 }
 
-function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onUpdateSprint, onDeleteSprint, onDragStart, onDragEnd, draggingId, dropTarget, onDragOverCard, onDragOverEmpty, editable, onSprintDragStart, onSprintDragOver, onSprintDrop, onSprintDragEnd, isSprintDragging, colWidth, isPublic, isSprintDropTarget, sprintDropSide, T, darkMode, labels }) {
-  const emptyTarget = editable&&dropTarget?.sprintId===sprint.id&&!dropTarget?.featureId;
+function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onUpdateSprint, onDeleteSprint, draggingId, dropTarget, editable, isSprintDragging, colWidth, isPublic, isSprintDropTarget, sprintDropSide, T, darkMode, labels, onDragHandleMouseDown, onSprintDragHandleMouseDown }) {
   const [confirmDel, setConfirmDel] = useState(false);
-  const [sprintDragging, setSprintDragging] = useState(false);
   const delRef = useRef();
   useClickOutside(delRef, ()=>setConfirmDel(false));
+
   const borderStyle = isSprintDropTarget&&sprintDropSide==="left"
     ? {borderLeft:"3px solid #4ade80",borderRight:`0.5px solid ${T.border}`,borderTop:`0.5px solid ${T.border}`,borderBottom:`0.5px solid ${T.border}`}
     : isSprintDropTarget&&sprintDropSide==="right"
     ? {borderRight:"3px solid #4ade80",borderLeft:`0.5px solid ${T.border}`,borderTop:`0.5px solid ${T.border}`,borderBottom:`0.5px solid ${T.border}`}
     : {border:`0.5px solid ${isSprintDragging?"#534AB7":T.border}`};
+
   return (
-    <div draggable={editable&&sprintDragging}
-      onDragStart={editable&&sprintDragging?e=>{ e.dataTransfer.effectAllowed="move"; onSprintDragStart(sprint.id); }:undefined}
-      onDragEnd={editable?()=>{ setSprintDragging(false); onSprintDragEnd(); }:undefined}
-      onDragOver={e=>{ e.preventDefault(); if(editable){ if(!sprint.features.length)onDragOverEmpty(sprint.id,e); onSprintDragOver(sprint.id,e); }}}
-      onDrop={e=>{ e.preventDefault(); if(editable)onSprintDrop(sprint.id,e); }}
+    <div data-sprint-id={sprint.id}
       style={{flexShrink:0,width:colWidth,background:T.bg2,borderRadius:12,padding:12,boxSizing:"border-box",opacity:isSprintDragging?0.4:1,transition:"opacity .15s, width .1s",...borderStyle}}>
       <div style={{marginBottom:12}}>
         <div style={{display:"flex",alignItems:"flex-start",gap:6}}>
-          {editable && <span onMouseDown={e=>{ e.stopPropagation(); setSprintDragging(true); }} onMouseUp={()=>setSprintDragging(false)} onMouseLeave={()=>setSprintDragging(false)} style={{color:T.text5,fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
+          {editable && (
+            <span onMouseDown={e=>{ e.stopPropagation(); onSprintDragHandleMouseDown(e, sprint.id); }}
+              style={{color:T.text5,fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>
+          )}
           <div style={{flex:1}}>
             <InlineEdit value={sprint.label} onChange={v=>onUpdateSprint(sprint.id,{label:v})} editable={editable} T={T} style={{fontSize:13,fontWeight:700,color:T.text2,display:"block"}}/>
             <InlineEdit value={sprint.dates} onChange={v=>onUpdateSprint(sprint.id,{dates:v})} editable={editable} T={T} placeholder="e.g. Feb 2–13" style={{fontSize:11,color:T.text5,marginTop:1,display:"block"}}/>
@@ -583,10 +593,10 @@ function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onU
           )}
         </div>
       </div>
-      {emptyTarget && <DropIndicator/>}
+      {dropTarget?.sprintId===sprint.id && !dropTarget?.featureId && editable && <DropIndicator/>}
       {(sprint.features||[]).map(f=>{
-        const pos=editable&&dropTarget?.sprintId===sprint.id&&dropTarget?.featureId===f.id?dropTarget.position:null;
-        return <FeatureCard key={f.id} feature={f} onUpdate={onUpdateFeature} onDelete={onDeleteFeature} onDragStart={onDragStart} onDragEnd={onDragEnd} isDragging={draggingId===f.id} onDragOverCard={(fid,p,e)=>onDragOverCard(sprint.id,fid,p,e)} dropPosition={pos} editable={editable} isPublic={isPublic} T={T} darkMode={darkMode} labels={labels}/>;
+        const pos = editable&&dropTarget?.sprintId===sprint.id&&dropTarget?.featureId===f.id ? dropTarget.position : null;
+        return <FeatureCard key={f.id} feature={f} onUpdate={onUpdateFeature} onDelete={onDeleteFeature} isDragging={draggingId===f.id} dropPosition={pos} editable={editable} isPublic={isPublic} T={T} darkMode={darkMode} labels={labels} onDragHandleMouseDown={onDragHandleMouseDown}/>;
       })}
       {editable && <button onClick={()=>onAddFeature(sprint.id)} style={{width:"100%",background:"transparent",border:`0.5px dashed ${T.border}`,borderRadius:8,color:T.text5,fontSize:11,padding:"7px",cursor:"pointer",marginTop:4}}>+ New feature</button>}
     </div>
@@ -597,31 +607,35 @@ export default function App() {
   const [data, setData] = useState(null);
   const [filter, setFilter] = useState("all");
   const [editMode, setEditMode] = useState(false);
-  const [draggingId, setDraggingId] = useState(null);
-  const [dropTarget, setDropTarget] = useState(null);
   const [saveStatus, setSaveStatus] = useState("idle");
   const [colWidth, setColWidth] = useState(()=>{ try{ return Number(localStorage.getItem("colWidth"))||280; }catch{ return 280; } });
-  const [draggingSprintId, setDraggingSprintId] = useState(null);
-  const [overSprintId, setOverSprintId] = useState(null);
-  const [sprintDropSide, setSprintDropSide] = useState(null);
   const [copied, setCopied] = useState(false);
   const [darkMode, setDarkMode] = useState(()=>{ try{ return localStorage.getItem("darkMode")!=="false"; }catch{ return true; } });
   const [authed, setAuthed] = useState(()=>{ try{ return localStorage.getItem("rm_auth")==="1"; }catch{ return false; } });
   const [passInput, setPassInput] = useState("");
   const [passErr, setPassErr] = useState(false);
 
+  // Drag state (all mouse-based now)
+  const [draggingId, setDraggingId] = useState(null);       // feature id being dragged
+  const [draggingSprintId, setDraggingSprintId] = useState(null);
+  const [dropTarget, setDropTarget] = useState(null);        // {sprintId, featureId, position}
+  const [sprintDropTarget, setSprintDropTarget] = useState(null); // {sprintId, side}
+  const [ghostPos, setGhostPos] = useState({x:0,y:0});
+  const dragState = useRef(null); // live drag info without re-renders
+
   const saveTimer = useRef(null);
   const history = useRef([]);
   const boardRef = useRef(null);
   const isPanning = useRef(false);
   const panStart = useRef({x:0,y:0,scrollX:0,scrollY:0});
-  const autoScrollRef = useRef(null);
+  const scrollRaf = useRef(null);
 
   const T = darkMode ? DARK : LIGHT;
   const isPublic = new URLSearchParams(window.location.search).get("view")==="public";
   const editable = editMode&&filter==="all"&&!isPublic;
 
   const setColWidthPersist = w => { setColWidth(w); try{ localStorage.setItem("colWidth",String(w)); }catch{}; };
+  const toggleDark = ()=>setDarkMode(d=>{ const next=!d; try{localStorage.setItem("darkMode",String(next));}catch{} return next; });
 
   const submitPass = () => {
     if (passInput===PASS) { setAuthed(true); try{ localStorage.setItem("rm_auth","1"); }catch{}; }
@@ -630,8 +644,7 @@ export default function App() {
 
   useEffect(()=>{
     const bg=darkMode?DARK.bg:LIGHT.bg;
-    document.body.style.background=bg;
-    document.documentElement.style.background=bg;
+    document.body.style.background=bg; document.documentElement.style.background=bg;
   },[darkMode]);
 
   useEffect(()=>{
@@ -642,8 +655,7 @@ export default function App() {
           const ff=seenIds.has(f.id)?{...f,id:newId()}:f; seenIds.add(ff.id);
           const tasks=(ff.tasks||[]).map(t=>{ if(seenIds.has(t.id)){const nt={...t,id:newId()};seenIds.add(nt.id);return nt;} seenIds.add(t.id); return t; });
           return {...ff,tasks};
-        })}))}; 
-        setData(fixed);
+        })}))}; setData(fixed);
       } else setData(INIT_DATA);
     }).catch(()=>setData(INIT_DATA));
   },[]);
@@ -656,58 +668,28 @@ export default function App() {
 
   const upd = useCallback(fn=>setData(prev=>{
     history.current=[...history.current.slice(-49), prev];
-    const next=fn(prev);
-    scheduleSave(next);
-    return next;
+    const next=fn(prev); scheduleSave(next); return next;
   }),[scheduleSave]);
 
   const undo = useCallback(()=>{
-    if(history.current.length===0) return;
+    if(!history.current.length) return;
     const prev=history.current[history.current.length-1];
     history.current=history.current.slice(0,-1);
-    setData(prev);
-    scheduleSave(prev);
+    setData(prev); scheduleSave(prev);
   },[scheduleSave]);
 
   useEffect(()=>{
-    const h=e=>{
-      if((e.ctrlKey||e.metaKey)&&e.key==="z"&&!e.shiftKey){
-        const tag=document.activeElement?.tagName;
-        if(tag==="INPUT"||tag==="TEXTAREA") return;
-        e.preventDefault(); undo();
-      }
-    };
-    document.addEventListener("keydown",h);
-    return ()=>document.removeEventListener("keydown",h);
+    const h=e=>{ if((e.ctrlKey||e.metaKey)&&e.key==="z"&&!e.shiftKey){ const tag=document.activeElement?.tagName; if(tag==="INPUT"||tag==="TEXTAREA") return; e.preventDefault(); undo(); } };
+    document.addEventListener("keydown",h); return ()=>document.removeEventListener("keydown",h);
   },[undo]);
-
-  const startAutoScroll = useCallback(clientX=>{
-    if(!boardRef.current) return;
-    cancelAnimationFrame(autoScrollRef.current);
-    const board=boardRef.current;
-    const scroll=()=>{
-      if(!boardRef.current) return;
-      const rect=board.getBoundingClientRect();
-      const ZONE=80; const SPEED=12;
-      if(clientX<rect.left+ZONE) board.scrollLeft-=SPEED;
-      else if(clientX>rect.right-ZONE) board.scrollLeft+=SPEED;
-      autoScrollRef.current=requestAnimationFrame(scroll);
-    };
-    autoScrollRef.current=requestAnimationFrame(scroll);
-  },[]);
-
-  const stopAutoScroll = useCallback(()=>{ cancelAnimationFrame(autoScrollRef.current); },[]);
 
   const labels = data?.labels||[];
   const stickyNotes = data?.stickyNotes||[];
-
-  const toggleDark = ()=>setDarkMode(d=>{ const next=!d; try{localStorage.setItem("darkMode",String(next));}catch{} return next; });
 
   const updLabels = fn=>upd(p=>({...p,labels:fn(p.labels||[])}));
   const addLabel = ()=>updLabels(ls=>[...ls,{id:newId(),name:"New label",colorId:LABEL_COLORS[ls.length%LABEL_COLORS.length].id}]);
   const updateLabel = (id,ch)=>updLabels(ls=>ls.map(l=>l.id===id?{...l,...ch}:l));
   const deleteLabel = id=>updLabels(ls=>ls.filter(l=>l.id!==id));
-
   const updStickies = fn=>upd(p=>({...p,stickyNotes:fn(p.stickyNotes||[])}));
   const addSticky = ()=>updStickies(ns=>[...ns,{id:newId(),text:"",color:STICKY_COLORS[ns.length%STICKY_COLORS.length]}]);
   const updateSticky = (id,ch)=>updStickies(ns=>ns.map(n=>n.id===id?{...n,...ch}:n));
@@ -720,40 +702,170 @@ export default function App() {
   const deleteSprint = useCallback(sid=>upd(p=>({...p,sprints:p.sprints.filter(s=>s.id!==sid)})),[upd]);
   const addSprint = useCallback(()=>upd(p=>({...p,sprints:[...p.sprints,{id:newId(),label:`Sprint ${58+p.sprints.length-3}`,dates:"Dates TBD",features:[]}]})),[upd]);
 
-  const handleDragStart = useCallback(fid=>setDraggingId(fid),[]);
-  const handleDragEnd = useCallback(()=>{ setDraggingId(null); setDropTarget(null); stopAutoScroll(); },[stopAutoScroll]);
-  const handleDragOverCard = useCallback((sid,fid,pos,e)=>{ setDropTarget({sprintId:sid,featureId:fid,position:pos}); if(e) startAutoScroll(e.clientX); },[startAutoScroll]);
-  const handleDragOverEmpty = useCallback((sid,e)=>{ setDropTarget({sprintId:sid,featureId:null,position:"after"}); if(e) startAutoScroll(e.clientX); },[startAutoScroll]);
+  // ── Mouse-based drag for feature cards ──────────────────────────────────────
+  const getDropInfo = useCallback((cx, cy) => {
+    if (!boardRef.current) return null;
+    // Find which sprint column we're over
+    const sprintEls = boardRef.current.querySelectorAll("[data-sprint-id]");
+    let targetSprint = null;
+    for (const el of sprintEls) {
+      const r = el.getBoundingClientRect();
+      if (cx >= r.left && cx <= r.right) { targetSprint = el; break; }
+    }
+    if (!targetSprint) return null;
+    const sid = targetSprint.getAttribute("data-sprint-id");
+    // Find which feature card we're over (by vertical position)
+    const cardEls = targetSprint.querySelectorAll("[data-feature-id]");
+    for (const el of cardEls) {
+      const fid = el.getAttribute("data-feature-id");
+      if (fid === dragState.current?.featureId) continue;
+      const r = el.getBoundingClientRect();
+      if (cy < r.bottom) {
+        return { sprintId: sid, featureId: fid, position: cy < r.top + r.height/2 ? "before" : "after" };
+      }
+    }
+    return { sprintId: sid, featureId: null, position: "after" };
+  }, []);
 
-  const handleDrop = useCallback(e=>{
-    if(!editable) return; e.preventDefault(); if(!draggingId||!dropTarget) return;
-    upd(prev=>{
-      let moved=null;
-      let sprints=prev.sprints.map(s=>{ const f=s.features.find(f=>f.id===draggingId); if(f){ moved=f; return{...s,features:s.features.filter(f=>f.id!==draggingId)}; } return s; });
-      if(!moved) return prev;
-      sprints=sprints.map(s=>{ if(s.id!==dropTarget.sprintId) return s; const feats=[...s.features]; if(!dropTarget.featureId) feats.push(moved); else{ const idx=feats.findIndex(f=>f.id===dropTarget.featureId); feats.splice(dropTarget.position==="before"?idx:idx+1,0,moved); } return{...s,features:feats}; });
-      return{...prev,sprints};
-    });
-    setDraggingId(null); setDropTarget(null); stopAutoScroll();
-  },[draggingId,dropTarget,editable,upd,stopAutoScroll]);
+  const getSprintDropInfo = useCallback((cx) => {
+    if (!boardRef.current) return null;
+    const sprintEls = boardRef.current.querySelectorAll("[data-sprint-id]");
+    for (const el of sprintEls) {
+      const sid = el.getAttribute("data-sprint-id");
+      if (sid === dragState.current?.sprintId) continue;
+      const r = el.getBoundingClientRect();
+      if (cx >= r.left && cx <= r.right) {
+        return { sprintId: sid, side: cx < r.left + r.width/2 ? "left" : "right" };
+      }
+    }
+    return null;
+  }, []);
 
-  const handleSprintDragStart = useCallback(sid=>setDraggingSprintId(sid),[]);
-  const handleSprintDragOver = useCallback((sid,e)=>{ if(!e||!e.currentTarget) return; const rect=e.currentTarget.getBoundingClientRect(); setOverSprintId(sid); setSprintDropSide(e.clientX<rect.left+rect.width/2?"left":"right"); startAutoScroll(e.clientX); },[startAutoScroll]);
-  const handleSprintDragEnd = useCallback(()=>{ setDraggingSprintId(null); setOverSprintId(null); setSprintDropSide(null); stopAutoScroll(); },[stopAutoScroll]);
-  const handleSprintDrop = useCallback((targetId,e)=>{
-    if(!draggingSprintId||draggingSprintId===targetId) return;
-    const rect=e.currentTarget.getBoundingClientRect(); const side=e.clientX<rect.left+rect.width/2?"left":"right";
-    upd(prev=>{ const sprints=[...prev.sprints]; const fromIdx=sprints.findIndex(s=>s.id===draggingSprintId); const[moved]=sprints.splice(fromIdx,1); const toIdx=sprints.findIndex(s=>s.id===targetId); sprints.splice(side==="left"?toIdx:toIdx+1,0,moved); return{...prev,sprints}; });
-    setDraggingSprintId(null); setOverSprintId(null); setSprintDropSide(null); stopAutoScroll();
-  },[draggingSprintId,upd,stopAutoScroll]);
+  const runAutoScroll = useCallback((cx, cy) => {
+    cancelAnimationFrame(scrollRaf.current);
+    const board = boardRef.current;
+    if (!board) return;
+    const tick = () => {
+      if (!dragState.current) return;
+      const br = board.getBoundingClientRect();
+      const HZONE = 80, VZONE = 80, SPEED = 10;
+      if (cx < br.left + HZONE) board.scrollLeft -= SPEED;
+      else if (cx > br.right - HZONE) board.scrollLeft += SPEED;
+      if (cy < br.top + VZONE) window.scrollBy(0, -SPEED);
+      else if (cy > br.bottom - VZONE) window.scrollBy(0, SPEED);
+      scrollRaf.current = requestAnimationFrame(tick);
+    };
+    scrollRaf.current = requestAnimationFrame(tick);
+  }, []);
 
-  const onBoardMouseDown = e=>{ if(e.target!==boardRef.current) return; e.preventDefault(); isPanning.current=true; panStart.current={x:e.clientX,y:e.clientY,scrollX:boardRef.current.scrollLeft,scrollY:window.scrollY}; boardRef.current.style.cursor="grabbing"; boardRef.current.style.userSelect="none"; document.body.style.userSelect="none"; };
-  const onBoardMouseMove = e=>{ if(!isPanning.current) return; e.preventDefault(); const dx=e.clientX-panStart.current.x; const dy=e.clientY-panStart.current.y; boardRef.current.scrollLeft=panStart.current.scrollX-dx; window.scrollTo(0,panStart.current.scrollY-dy); };
-  const onBoardMouseUp = e=>{ if(!isPanning.current) return; isPanning.current=false; boardRef.current.style.userSelect=""; document.body.style.userSelect=""; if(boardRef.current) boardRef.current.style.cursor=(e&&e.target===boardRef.current)?"grab":"default"; };
-  const onBoardMouseOverCard = e=>{ if(!boardRef.current||isPanning.current) return; boardRef.current.style.cursor=e.target===boardRef.current?"grab":"default"; };
-  const copyPublicLink = ()=>{ const url=`${window.location.origin}${window.location.pathname}?view=public`; navigator.clipboard.writeText(url).then(()=>{ setCopied(true); setTimeout(()=>setCopied(false),2000); }); };
+  const stopAutoScroll = useCallback(() => cancelAnimationFrame(scrollRaf.current), []);
 
-  // Password gate
+  const onDragHandleMouseDown = useCallback((e, featureId) => {
+    if (!editable) return;
+    e.preventDefault();
+    dragState.current = { type: "feature", featureId, startX: e.clientX, startY: e.clientY, moved: false };
+    setDraggingId(featureId);
+    setGhostPos({ x: e.clientX - 130, y: e.clientY - 20 });
+  }, [editable]);
+
+  const onSprintDragHandleMouseDown = useCallback((e, sprintId) => {
+    if (!editable) return;
+    e.preventDefault();
+    dragState.current = { type: "sprint", sprintId, startX: e.clientX, startY: e.clientY, moved: false };
+    setDraggingSprintId(sprintId);
+  }, [editable]);
+
+  useEffect(() => {
+    const onMove = e => {
+      const ds = dragState.current;
+      if (!ds) return;
+      ds.moved = true;
+      const cx = e.clientX, cy = e.clientY;
+
+      if (ds.type === "feature") {
+        setGhostPos({ x: cx - 130, y: cy - 20 });
+        const info = getDropInfo(cx, cy);
+        setDropTarget(info);
+        runAutoScroll(cx, cy);
+      } else if (ds.type === "sprint") {
+        const info = getSprintDropInfo(cx);
+        setSprintDropTarget(info);
+        runAutoScroll(cx, cy);
+      }
+    };
+
+    const onUp = e => {
+      const ds = dragState.current;
+      if (!ds) return;
+      dragState.current = null;
+      stopAutoScroll();
+
+      if (ds.type === "feature") {
+        const info = getDropInfo(e.clientX, e.clientY);
+        if (info && ds.moved) {
+          upd(prev => {
+            let moved = null;
+            let sprints = prev.sprints.map(s => {
+              const f = s.features.find(f => f.id === ds.featureId);
+              if (f) { moved = f; return { ...s, features: s.features.filter(f => f.id !== ds.featureId) }; }
+              return s;
+            });
+            if (!moved) return prev;
+            sprints = sprints.map(s => {
+              if (s.id !== info.sprintId) return s;
+              const feats = [...s.features];
+              if (!info.featureId) feats.push(moved);
+              else { const idx = feats.findIndex(f => f.id === info.featureId); feats.splice(info.position==="before"?idx:idx+1, 0, moved); }
+              return { ...s, features: feats };
+            });
+            return { ...prev, sprints };
+          });
+        }
+        setDraggingId(null); setDropTarget(null);
+      } else if (ds.type === "sprint") {
+        const info = getSprintDropInfo(e.clientX);
+        if (info && ds.moved) {
+          upd(prev => {
+            const sprints = [...prev.sprints];
+            const fromIdx = sprints.findIndex(s => s.id === ds.sprintId);
+            const [moved] = sprints.splice(fromIdx, 1);
+            const toIdx = sprints.findIndex(s => s.id === info.sprintId);
+            sprints.splice(info.side==="left" ? toIdx : toIdx+1, 0, moved);
+            return { ...prev, sprints };
+          });
+        }
+        setDraggingSprintId(null); setSprintDropTarget(null);
+      }
+    };
+
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+    return () => { document.removeEventListener("mousemove", onMove); document.removeEventListener("mouseup", onUp); };
+  }, [getDropInfo, getSprintDropInfo, runAutoScroll, stopAutoScroll, upd]);
+
+  // Board pan (only when clicking directly on board background)
+  const onBoardMouseDown = e => {
+    if (e.target !== boardRef.current) return;
+    e.preventDefault(); isPanning.current = true;
+    panStart.current = { x: e.clientX, y: e.clientY, scrollX: boardRef.current.scrollLeft, scrollY: window.scrollY };
+    boardRef.current.style.cursor = "grabbing"; boardRef.current.style.userSelect = "none"; document.body.style.userSelect = "none";
+  };
+  const onBoardMouseMove = e => {
+    if (!isPanning.current) return; e.preventDefault();
+    boardRef.current.scrollLeft = panStart.current.scrollX - (e.clientX - panStart.current.x);
+    window.scrollTo(0, panStart.current.scrollY - (e.clientY - panStart.current.y));
+  };
+  const onBoardMouseUp = e => {
+    if (!isPanning.current) return; isPanning.current = false;
+    boardRef.current.style.userSelect = ""; document.body.style.userSelect = "";
+    boardRef.current.style.cursor = e.target === boardRef.current ? "grab" : "default";
+  };
+
+  const copyPublicLink = () => { const url=`${window.location.origin}${window.location.pathname}?view=public`; navigator.clipboard.writeText(url).then(()=>{ setCopied(true); setTimeout(()=>setCopied(false),2000); }); };
+
+  // Find the feature being dragged for ghost
+  const draggingFeature = draggingId && data ? data.sprints.flatMap(s=>s.features).find(f=>f.id===draggingId) : null;
+
   if (!authed) return (
     <div style={{background:T.bg,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"system-ui"}}>
       <div style={{background:T.bg2,border:`0.5px solid ${T.border2}`,borderRadius:16,padding:"40px 48px",display:"flex",flexDirection:"column",alignItems:"center",gap:20,boxShadow:"0 8px 32px rgba(0,0,0,.4)",minWidth:320}}>
@@ -761,8 +873,7 @@ export default function App() {
         <div style={{fontSize:18,fontWeight:700,color:T.text}}>Roadmap</div>
         <div style={{fontSize:13,color:T.text4}}>Enter password to continue</div>
         <input autoFocus type="password" value={passInput} placeholder="Password"
-          onChange={e=>setPassInput(e.target.value)}
-          onKeyDown={e=>e.key==="Enter"&&submitPass()}
+          onChange={e=>setPassInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submitPass()}
           style={{width:"100%",background:T.inputBg,border:`1.5px solid ${passErr?"#ef4444":T.inputBorder}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 14px",outline:"none",boxSizing:"border-box",transition:"border-color .2s",fontFamily:"system-ui"}}/>
         {passErr && <div style={{fontSize:12,color:"#ef4444",marginTop:-12}}>Incorrect password</div>}
         <button onClick={submitPass} style={{width:"100%",background:"#534AB7",border:"none",borderRadius:8,color:"#fff",fontSize:14,fontWeight:600,padding:"10px 0",cursor:"pointer"}}>Unlock</button>
@@ -770,19 +881,17 @@ export default function App() {
     </div>
   );
 
-  if(!data) return <div style={{background:T.bg,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:T.text5,fontFamily:"system-ui"}}>Loading roadmap…</div>;
+  if (!data) return <div style={{background:T.bg,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:T.text5,fontFamily:"system-ui"}}>Loading roadmap…</div>;
 
-  const filtered={...data,sprints:data.sprints.map(s=>({...s,features:s.features.filter(f=>{ if(filter==="xl-l") return f.size==="XL"||f.size==="L"; if(filter==="m-s") return f.size==="M"||f.size==="S"; return true; })}))};
-  const fBtn=(v,l)=><button key={v} onClick={()=>setFilter(v)} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:"0.5px solid",background:filter===v?T.bg5:"transparent",color:filter===v?T.text:T.text5,borderColor:filter===v?T.border3:T.border}}>{l}</button>;
-  const statusColor=saveStatus==="saved"?"#4ade80":saveStatus==="saving"?"#fbbf24":"transparent";
-  const statusText=saveStatus==="saved"?"✓ Saved":saveStatus==="saving"?"Saving…":"";
-  const LABEL_BAR_H=42;
+  const filtered = { ...data, sprints: data.sprints.map(s=>({ ...s, features: s.features.filter(f=>{ if(filter==="xl-l") return f.size==="XL"||f.size==="L"; if(filter==="m-s") return f.size==="M"||f.size==="S"; return true; }) })) };
+  const fBtn = (v,l) => <button key={v} onClick={()=>setFilter(v)} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:"0.5px solid",background:filter===v?T.bg5:"transparent",color:filter===v?T.text:T.text5,borderColor:filter===v?T.border3:T.border}}>{l}</button>;
+  const statusColor = saveStatus==="saved"?"#4ade80":saveStatus==="saving"?"#fbbf24":"transparent";
+  const statusText = saveStatus==="saved"?"✓ Saved":saveStatus==="saving"?"Saving…":"";
 
   return (
-    <div onDragOver={e=>{ if(editable) e.preventDefault(); }} onDrop={handleDrop}
-      style={{background:T.bg,minHeight:"100vh",fontFamily:"system-ui,sans-serif",boxSizing:"border-box"}}>
+    <div style={{background:T.bg,minHeight:"100vh",fontFamily:"system-ui,sans-serif",boxSizing:"border-box",userSelect:draggingId?"none":"auto"}}>
       <LabelBar labels={labels} onAdd={addLabel} onUpdate={updateLabel} onDelete={deleteLabel} editable={editable} darkMode={darkMode} T={T}/>
-      <div style={{padding:`${LABEL_BAR_H+16}px 0 0`}}>
+      <div style={{padding:"58px 0 0"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:8,padding:"0 16px"}}>
           <h1 style={{fontSize:20,fontWeight:700,color:T.text,margin:0}}>Roadmap</h1>
           <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
@@ -791,7 +900,7 @@ export default function App() {
             {!isPublic&&filter==="all"&&<button onClick={()=>setEditMode(m=>!m)} style={{padding:"4px 14px",borderRadius:20,fontSize:11,cursor:"pointer",border:`0.5px solid ${editMode?"#4ade80":T.border}`,background:editMode?"#1a3a2a":"transparent",color:editMode?"#4ade80":T.text5,transition:"all .2s"}}>{editMode?"✓ Editing":"Edit"}</button>}
             {editable&&<button onClick={addSprint} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:`0.5px solid ${T.border}`,background:"transparent",color:T.text5}}>+ Sprint</button>}
             {!isPublic&&<button onClick={copyPublicLink} style={{padding:"4px 12px",borderRadius:20,fontSize:11,cursor:"pointer",border:`0.5px solid ${copied?"#4ade80":T.border}`,background:copied?"#1a3a2a":"transparent",color:copied?"#4ade80":T.text5,transition:"all .2s"}}>{copied?"✓ Copied!":"Share ↗"}</button>}
-            <button onClick={toggleDark} title="Toggle light/dark" style={{padding:"4px 10px",borderRadius:20,fontSize:12,cursor:"pointer",border:`0.5px solid ${T.border}`,background:"transparent",color:T.text5}}>{darkMode?"☀️":"🌙"}</button>
+            <button onClick={toggleDark} style={{padding:"4px 10px",borderRadius:20,fontSize:12,cursor:"pointer",border:`0.5px solid ${T.border}`,background:"transparent",color:T.text5}}>{darkMode?"☀️":"🌙"}</button>
             <div style={{display:"flex",alignItems:"center",gap:6}}>
               <span style={{fontSize:10,color:T.text5,whiteSpace:"nowrap"}}>⟷</span>
               <input type="range" min={220} max={500} value={colWidth} onChange={e=>setColWidthPersist(Number(e.target.value))} style={{width:70,accentColor:"#534AB7",cursor:"pointer"}}/>
@@ -801,13 +910,25 @@ export default function App() {
         <div style={{fontSize:10,color:T.text6,marginBottom:14,padding:"0 16px"}}>
           {isPublic?"Public view — read only":editable?"Drag ⠿ to reposition · Click size to change · Click phase to advance · Click text to edit · Ctrl+Z to undo":filter==="all"?"View mode — click Edit to make changes":"View only"}
         </div>
-        <div ref={boardRef} onMouseDown={onBoardMouseDown} onMouseMove={e=>{ onBoardMouseMove(e); onBoardMouseOverCard(e); }} onMouseUp={onBoardMouseUp} onMouseLeave={onBoardMouseUp}
-          style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:16,paddingLeft:16,paddingRight:16,cursor:"grab"}}>
+        <div ref={boardRef}
+          onMouseDown={onBoardMouseDown} onMouseMove={onBoardMouseMove} onMouseUp={onBoardMouseUp} onMouseLeave={onBoardMouseUp}
+          style={{display:"flex",gap:10,alignItems:"flex-start",overflowX:"auto",paddingBottom:24,paddingLeft:16,paddingRight:16,cursor:draggingId?"grabbing":"grab"}}>
           {filtered.sprints.map(s=>(
-            <SprintCol key={s.id} sprint={s} onUpdateFeature={updateFeature} onDeleteFeature={deleteFeature} onAddFeature={addFeature} onUpdateSprint={updateSprint} onDeleteSprint={deleteSprint} onDragStart={handleDragStart} onDragEnd={handleDragEnd} draggingId={draggingId} dropTarget={dropTarget} onDragOverCard={handleDragOverCard} onDragOverEmpty={handleDragOverEmpty} editable={editable} onSprintDragStart={handleSprintDragStart} onSprintDragOver={handleSprintDragOver} onSprintDrop={handleSprintDrop} onSprintDragEnd={handleSprintDragEnd} isSprintDragging={draggingSprintId===s.id} colWidth={colWidth} isPublic={isPublic} isSprintDropTarget={overSprintId===s.id} sprintDropSide={sprintDropSide} T={T} darkMode={darkMode} labels={labels}/>
+            <SprintCol key={s.id} sprint={s}
+              onUpdateFeature={updateFeature} onDeleteFeature={deleteFeature} onAddFeature={addFeature}
+              onUpdateSprint={updateSprint} onDeleteSprint={deleteSprint}
+              draggingId={draggingId} dropTarget={dropTarget}
+              editable={editable} isPublic={isPublic}
+              isSprintDragging={draggingSprintId===s.id}
+              isSprintDropTarget={sprintDropTarget?.sprintId===s.id}
+              sprintDropSide={sprintDropTarget?.sprintId===s.id?sprintDropTarget.side:null}
+              colWidth={colWidth} T={T} darkMode={darkMode} labels={labels}
+              onDragHandleMouseDown={onDragHandleMouseDown}
+              onSprintDragHandleMouseDown={onSprintDragHandleMouseDown}/>
           ))}
         </div>
       </div>
+      <GhostCard feature={draggingFeature} pos={ghostPos} T={T} darkMode={darkMode} labels={labels}/>
       <StickyNotes notes={stickyNotes} onAdd={addSticky} onUpdate={updateSticky} onDelete={deleteSticky} editable={editable} darkMode={darkMode} T={T}/>
     </div>
   );
