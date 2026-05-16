@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 const SUPABASE_URL = "https://fwktaxbgicooxmqleaho.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3a3RheGJnaWNvb3htcWxlYWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NTk3ODYsImV4cCI6MjA5MDEzNTc4Nn0._YNNkQn-jmvFziFAAWQbzxKEkpebQbYBfqg110WdDYo";
 const JIRA_BASE = "https://zenone.atlassian.net/browse";
+const PASS = "zenone2025"; // ← change to your team password
 
 async function loadData() {
   try {
@@ -42,7 +43,6 @@ let OWNER_COLORS = {
   Tanya:["#3a1a2a","#f472b6"], Michael:["#2a2a1a","#facc15"], Delaney:["#1a2a3a","#67e8f9"],
   Tiger:["#2a1a1a","#fca5a5"], Lana:["#1a2a3a","#67e8f9"]
 };
-
 const LABEL_COLORS = [
   { id:"green",   bg:"#4a7c59", light:"#d4ead9", border:"#91c4a0" },
   { id:"blue",    bg:"#3d6fa8", light:"#d0e4f7", border:"#8ab8e8" },
@@ -61,9 +61,7 @@ const LABEL_COLORS = [
   { id:"brown",   bg:"#7a5040", light:"#ead8d0", border:"#c0988a" },
   { id:"stone",   bg:"#6a6458", light:"#e5e2da", border:"#b0a898" },
 ];
-
 const STICKY_COLORS = ["#fef08a","#86efac","#93c5fd","#f9a8d4","#fdba74","#c4b5fd"];
-
 const DARK  = { bg:"#0f0f0f",bg2:"#141414",bg3:"#1a1a1a",bg4:"#1f1f1f",bg5:"#242424",border:"#2a2a2a",border2:"#333",border3:"#444",text:"#f0f0f0",text2:"#e0e0e0",text3:"#c0c0c0",text4:"#6b7280",text5:"#555",text6:"#333",inputBg:"#2a2a2a",inputBorder:"#555" };
 const LIGHT = { bg:"#f5f5f4",bg2:"#ffffff",bg3:"#fafaf9",bg4:"#f0efed",bg5:"#e8e8e6",border:"#d4d2cc",border2:"#c4c2bc",border3:"#b4b2ac",text:"#1c1c1a",text2:"#2c2c2a",text3:"#4c4c4a",text4:"#6c6c6a",text5:"#9c9c9a",text6:"#bbb",inputBg:"#ffffff",inputBorder:"#b4b2ac" };
 
@@ -123,10 +121,7 @@ function InlineEdit({ value, onChange, style={}, placeholder="Edit…", editable
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(value);
   const prevValueRef = useRef(value);
-  if (!editing && prevValueRef.current !== value) {
-    prevValueRef.current = value;
-    setVal(value);
-  }
+  if (!editing && prevValueRef.current !== value) { prevValueRef.current = value; setVal(value); }
   const commit = () => { setEditing(false); prevValueRef.current = val; if (val !== value) onChange(val); };
   if (!editable || !editing) return (
     <span onClick={editable ? e => { e.stopPropagation(); setEditing(true); } : undefined} style={{cursor:editable?"text":"default",...style}}>
@@ -318,7 +313,7 @@ function StickyNotes({ notes, onAdd, onUpdate, onDelete, editable, darkMode, T }
   return (
     <div style={{position:"fixed",bottom:16,right:16,zIndex:2000,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:8}}>
       <button onClick={()=>setCollapsed(c=>!c)} style={{background:darkMode?"#1f1f1f":"#fff",border:`0.5px solid ${T.border2}`,borderRadius:20,padding:"4px 12px",fontSize:11,color:T.text4,cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,.3)",display:"flex",alignItems:"center",gap:6}}>
-        📝 {collapsed?`Notes (${notes.length})`:"Notes ▾"}
+        📝 {collapsed ? `Notes (${notes.length})` : "Notes ▾"}
       </button>
       {!collapsed && (
         <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"flex-end",maxHeight:"60vh",overflowY:"auto"}}>
@@ -352,11 +347,13 @@ function StickyNote({ note, onUpdate, onDelete, editable }) {
         )}
         <div style={{display:"flex",gap:4,alignItems:"center",marginLeft:"auto"}}>
           {editable&&!confirmDel&&<span onClick={()=>setConfirmDel(true)} style={{fontSize:10,color:"rgba(0,0,0,0.35)",cursor:"pointer"}}>✕</span>}
-          {confirmDel&&<span style={{display:"flex",gap:4,alignItems:"center"}}>
-            <span style={{fontSize:10,color:"rgba(0,0,0,0.6)"}}>Delete?</span>
-            <span onClick={()=>onDelete(note.id)} style={{fontSize:10,color:"#dc2626",cursor:"pointer",fontWeight:600}}>Yes</span>
-            <span onClick={()=>setConfirmDel(false)} style={{fontSize:10,color:"rgba(0,0,0,0.4)",cursor:"pointer"}}>No</span>
-          </span>}
+          {confirmDel&&(
+            <span style={{display:"flex",gap:4,alignItems:"center"}}>
+              <span style={{fontSize:10,color:"rgba(0,0,0,0.6)"}}>Delete?</span>
+              <span onClick={()=>onDelete(note.id)} style={{fontSize:10,color:"#dc2626",cursor:"pointer",fontWeight:600}}>Yes</span>
+              <span onClick={()=>setConfirmDel(false)} style={{fontSize:10,color:"rgba(0,0,0,0.4)",cursor:"pointer"}}>No</span>
+            </span>
+          )}
         </div>
       </div>
       {editable
@@ -424,7 +421,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
   const onDragOv = e=>{
     if(!editable) return; e.preventDefault(); e.stopPropagation();
     const r=cardRef.current.getBoundingClientRect();
-    onDragOverCard(feature.id, e.clientY<r.top+r.height/2?"before":"after");
+    onDragOverCard(feature.id, e.clientY<r.top+r.height/2?"before":"after", e);
   };
 
   const engState = feature.phases.eng;
@@ -448,7 +445,7 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
       <div draggable={editable&&dragging}
         onDragStart={editable&&dragging?e=>{ e.dataTransfer.effectAllowed="move"; e.stopPropagation(); onDragStart(feature.id); }:e=>e.preventDefault()}
         onDragEnd={editable?()=>{ onDragEnd(); setDragging(false); }:undefined}
-        style={{background:T.bg3,border:`0.5px solid ${T.border}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?.3:1,boxShadow:cardBoxShadow}}>
+        style={{background:T.bg3,border:`0.5px solid ${T.border}`,borderRadius:10,overflow:"hidden",marginBottom:8,opacity:isDragging?0.3:1,boxShadow:cardBoxShadow}}>
         <div style={{background:headerBg,padding:"9px 10px"}}>
           <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
             {editable && <span onMouseDown={e=>{ e.stopPropagation(); setDragging(true); }} onMouseUp={()=>setDragging(false)} onMouseLeave={()=>setDragging(false)} style={{color:T.text5,fontSize:13,cursor:"grab",flexShrink:0,userSelect:"none",marginTop:2,padding:"0 2px"}}>⠿</span>}
@@ -457,16 +454,20 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
             <InlineEdit value={feature.name} onChange={v=>onUpdate(feature.id,{name:v})} editable={editable} T={T} style={{flex:1,minWidth:0,fontSize:13,fontWeight:600,color:T.text,lineHeight:1.4,wordBreak:"break-word",whiteSpace:"normal"}}/>
             <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:2}}>
               <span onClick={toggleCollapsed} style={{fontSize:10,color:T.text5,cursor:"pointer",padding:"0 2px"}}>{collapsed?"▸":"▾"}</span>
-              {editable && <div ref={delRef} style={{position:"relative"}}>
-                <span onClick={()=>setConfirmDel(true)} style={{fontSize:10,color:T.text5,cursor:"pointer",padding:"0 2px"}}>✕</span>
-                {confirmDel && <div style={{position:"absolute",top:0,right:24,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:110,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
-                  <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete?</span>
-                  <div style={{display:"flex",gap:6}}>
-                    <button onClick={()=>onDelete(feature.id)} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
-                    <button onClick={()=>setConfirmDel(false)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
-                  </div>
-                </div>}
-              </div>}
+              {editable && (
+                <div ref={delRef} style={{position:"relative"}}>
+                  <span onClick={()=>setConfirmDel(true)} style={{fontSize:10,color:T.text5,cursor:"pointer",padding:"0 2px"}}>✕</span>
+                  {confirmDel && (
+                    <div style={{position:"absolute",top:0,right:24,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:110,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
+                      <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete?</span>
+                      <div style={{display:"flex",gap:6}}>
+                        <button onClick={()=>onDelete(feature.id)} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
+                        <button onClick={()=>setConfirmDel(false)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           <div style={{display:"flex",alignItems:"center",gap:6,marginTop:5,paddingLeft:editable?22:0}}>
@@ -490,39 +491,47 @@ function FeatureCard({ feature, onUpdate, onDelete, onDragStart, onDragEnd, isDr
                   </div>
                   {editable&&!task.done
                     ? <TaskTextarea value={task.name} onCommit={v=>updateTask(task.id,{name:v})} T={T}/>
-                    : <span style={{flex:1,fontSize:11,color:task.done?T.text4:T.text3,lineHeight:1.5,textDecoration:task.done?"line-through":"none",opacity:task.done?.6:1,textAlign:"left",wordBreak:"break-word",whiteSpace:"normal"}}>{task.name||<span style={{opacity:.3}}>Task description</span>}</span>
+                    : <span style={{flex:1,fontSize:11,color:task.done?T.text4:T.text3,lineHeight:1.5,textDecoration:task.done?"line-through":"none",opacity:task.done?0.6:1,textAlign:"left",wordBreak:"break-word",whiteSpace:"normal"}}>{task.name||<span style={{opacity:.3}}>Task description</span>}</span>
                   }
                   <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,marginTop:1}}>
                     <JiraTag ticketId={task.jiraId} onChange={v=>updateTask(task.id,{jiraId:v})} editable={editable}/>
                     <OwnersPicker owners={task.owners||[]} onChange={v=>updateTask(task.id,{owners:v})} editable={editable} T={T}/>
-                    {editable && <div style={{position:"relative",flexShrink:0}}>
-                      <span onClick={()=>setConfirmTask(task.id)} style={{fontSize:10,color:T.text6,cursor:"pointer"}}>✕</span>
-                      {confirmTask===task.id && <div style={{position:"absolute",top:0,right:18,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:110,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
-                        <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete task?</span>
-                        <div style={{display:"flex",gap:6}}>
-                          <button onClick={()=>{ deleteTask(task.id); setConfirmTask(null); }} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
-                          <button onClick={()=>setConfirmTask(null)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
-                        </div>
-                      </div>}
-                    </div>}
+                    {editable && (
+                      <div style={{position:"relative",flexShrink:0}}>
+                        <span onClick={()=>setConfirmTask(task.id)} style={{fontSize:10,color:T.text6,cursor:"pointer"}}>✕</span>
+                        {confirmTask===task.id && (
+                          <div style={{position:"absolute",top:0,right:18,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:110,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
+                            <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete task?</span>
+                            <div style={{display:"flex",gap:6}}>
+                              <button onClick={()=>{ deleteTask(task.id); setConfirmTask(null); }} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
+                              <button onClick={()=>setConfirmTask(null)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
               {editable && <button onClick={addTask} style={{background:"transparent",border:`0.5px dashed ${T.border2}`,borderRadius:6,color:T.text5,fontSize:10,padding:"4px 8px",cursor:"pointer",textAlign:"left"}}>+ Add task</button>}
             </div>
             <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap",paddingTop:4,borderTop:`0.5px solid ${T.border}`}}>
-              {editable ? <>
-                <span style={{fontSize:10,color:T.text4}}>EST:</span>
-                <input type="number" min="0" value={feature.estNum||""} onChange={e=>onUpdate(feature.id,{estNum:e.target.value})} placeholder="–" style={{width:36,background:T.inputBg,border:`0.5px solid ${T.border2}`,borderRadius:4,color:T.text4,fontSize:10,padding:"2px 4px",outline:"none",textAlign:"center"}}/>
-                <select value={feature.estUnit||"days"} onChange={e=>onUpdate(feature.id,{estUnit:e.target.value})} style={{background:T.inputBg,border:`0.5px solid ${T.border2}`,borderRadius:4,color:T.text4,fontSize:10,padding:"2px 4px",outline:"none",cursor:"pointer"}}>
-                  <option value="days">day(s)</option>
-                  <option value="weeks">week(s)</option>
-                </select>
-                <InlineEdit value={feature.note||""} onChange={v=>onUpdate(feature.id,{note:v})} editable T={T} placeholder="+ add note" style={{fontSize:10,color:T.text4,fontStyle:"italic"}}/>
-              </> : <>
-                {feature.estNum && <span style={{fontSize:10,color:T.text4}}>EST: {feature.estNum} {feature.estUnit}</span>}
-                {feature.note && <span style={{fontSize:10,color:T.text4,fontStyle:"italic"}}>{feature.note}</span>}
-              </>}
+              {editable ? (
+                <>
+                  <span style={{fontSize:10,color:T.text4}}>EST:</span>
+                  <input type="number" min="0" value={feature.estNum||""} onChange={e=>onUpdate(feature.id,{estNum:e.target.value})} placeholder="–" style={{width:36,background:T.inputBg,border:`0.5px solid ${T.border2}`,borderRadius:4,color:T.text4,fontSize:10,padding:"2px 4px",outline:"none",textAlign:"center"}}/>
+                  <select value={feature.estUnit||"days"} onChange={e=>onUpdate(feature.id,{estUnit:e.target.value})} style={{background:T.inputBg,border:`0.5px solid ${T.border2}`,borderRadius:4,color:T.text4,fontSize:10,padding:"2px 4px",outline:"none",cursor:"pointer"}}>
+                    <option value="days">day(s)</option>
+                    <option value="weeks">week(s)</option>
+                  </select>
+                  <InlineEdit value={feature.note||""} onChange={v=>onUpdate(feature.id,{note:v})} editable T={T} placeholder="+ add note" style={{fontSize:10,color:T.text4,fontStyle:"italic"}}/>
+                </>
+              ) : (
+                <>
+                  {feature.estNum && <span style={{fontSize:10,color:T.text4}}>EST: {feature.estNum} {feature.estUnit}</span>}
+                  {feature.note && <span style={{fontSize:10,color:T.text4,fontStyle:"italic"}}>{feature.note}</span>}
+                </>
+              )}
             </div>
           </div>
         )}
@@ -547,7 +556,7 @@ function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onU
     <div draggable={editable&&sprintDragging}
       onDragStart={editable&&sprintDragging?e=>{ e.dataTransfer.effectAllowed="move"; onSprintDragStart(sprint.id); }:undefined}
       onDragEnd={editable?()=>{ setSprintDragging(false); onSprintDragEnd(); }:undefined}
-      onDragOver={e=>{ e.preventDefault(); if(editable){ if(!sprint.features.length)onDragOverEmpty(sprint.id); onSprintDragOver(sprint.id,e); }}}
+      onDragOver={e=>{ e.preventDefault(); if(editable){ if(!sprint.features.length)onDragOverEmpty(sprint.id,e); onSprintDragOver(sprint.id,e); }}}
       onDrop={e=>{ e.preventDefault(); if(editable)onSprintDrop(sprint.id,e); }}
       style={{flexShrink:0,width:colWidth,background:T.bg2,borderRadius:12,padding:12,boxSizing:"border-box",opacity:isSprintDragging?0.4:1,transition:"opacity .15s, width .1s",...borderStyle}}>
       <div style={{marginBottom:12}}>
@@ -557,23 +566,27 @@ function SprintCol({ sprint, onUpdateFeature, onDeleteFeature, onAddFeature, onU
             <InlineEdit value={sprint.label} onChange={v=>onUpdateSprint(sprint.id,{label:v})} editable={editable} T={T} style={{fontSize:13,fontWeight:700,color:T.text2,display:"block"}}/>
             <InlineEdit value={sprint.dates} onChange={v=>onUpdateSprint(sprint.id,{dates:v})} editable={editable} T={T} placeholder="e.g. Feb 2–13" style={{fontSize:11,color:T.text5,marginTop:1,display:"block"}}/>
           </div>
-          {editable && <div ref={delRef} style={{position:"relative",flexShrink:0,marginTop:2}}>
-            <span onClick={()=>setConfirmDel(true)} style={{fontSize:10,color:T.text6,cursor:"pointer",padding:"2px 4px"}}>✕</span>
-            {confirmDel && <div style={{position:"absolute",top:0,right:20,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:130,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
-              <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete sprint?</span>
-              <span style={{fontSize:10,color:"#6b7280"}}>All features will be deleted.</span>
-              <div style={{display:"flex",gap:6}}>
-                <button onClick={()=>onDeleteSprint(sprint.id)} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
-                <button onClick={()=>setConfirmDel(false)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
-              </div>
-            </div>}
-          </div>}
+          {editable && (
+            <div ref={delRef} style={{position:"relative",flexShrink:0,marginTop:2}}>
+              <span onClick={()=>setConfirmDel(true)} style={{fontSize:10,color:T.text6,cursor:"pointer",padding:"2px 4px"}}>✕</span>
+              {confirmDel && (
+                <div style={{position:"absolute",top:0,right:20,background:"#1f1f1f",border:"0.5px solid #444",borderRadius:8,padding:"8px 10px",zIndex:200,display:"flex",flexDirection:"column",gap:6,minWidth:130,boxShadow:"0 4px 12px rgba(0,0,0,.6)"}}>
+                  <span style={{fontSize:11,color:"#e0e0e0",fontWeight:500}}>Delete sprint?</span>
+                  <span style={{fontSize:10,color:"#6b7280"}}>All features will be deleted.</span>
+                  <div style={{display:"flex",gap:6}}>
+                    <button onClick={()=>onDeleteSprint(sprint.id)} style={{flex:1,background:"#7f1d1d",border:"0.5px solid #ef4444",borderRadius:5,color:"#fca5a5",fontSize:10,padding:"3px 0",cursor:"pointer"}}>Yes</button>
+                    <button onClick={()=>setConfirmDel(false)} style={{flex:1,background:"#2a2a2a",border:"0.5px solid #444",borderRadius:5,color:"#9ca3af",fontSize:10,padding:"3px 0",cursor:"pointer"}}>No</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       {emptyTarget && <DropIndicator/>}
       {(sprint.features||[]).map(f=>{
         const pos=editable&&dropTarget?.sprintId===sprint.id&&dropTarget?.featureId===f.id?dropTarget.position:null;
-        return <FeatureCard key={f.id} feature={f} onUpdate={onUpdateFeature} onDelete={onDeleteFeature} onDragStart={onDragStart} onDragEnd={onDragEnd} isDragging={draggingId===f.id} onDragOverCard={(fid,p)=>onDragOverCard(sprint.id,fid,p)} dropPosition={pos} editable={editable} isPublic={isPublic} T={T} darkMode={darkMode} labels={labels}/>;
+        return <FeatureCard key={f.id} feature={f} onUpdate={onUpdateFeature} onDelete={onDeleteFeature} onDragStart={onDragStart} onDragEnd={onDragEnd} isDragging={draggingId===f.id} onDragOverCard={(fid,p,e)=>onDragOverCard(sprint.id,fid,p,e)} dropPosition={pos} editable={editable} isPublic={isPublic} T={T} darkMode={darkMode} labels={labels}/>;
       })}
       {editable && <button onClick={()=>onAddFeature(sprint.id)} style={{width:"100%",background:"transparent",border:`0.5px dashed ${T.border}`,borderRadius:8,color:T.text5,fontSize:11,padding:"7px",cursor:"pointer",marginTop:4}}>+ New feature</button>}
     </div>
@@ -587,26 +600,33 @@ export default function App() {
   const [draggingId, setDraggingId] = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
   const [saveStatus, setSaveStatus] = useState("idle");
-  const [colWidth, setColWidth] = useState(280);
+  const [colWidth, setColWidth] = useState(()=>{ try{ return Number(localStorage.getItem("colWidth"))||280; }catch{ return 280; } });
   const [draggingSprintId, setDraggingSprintId] = useState(null);
   const [overSprintId, setOverSprintId] = useState(null);
   const [sprintDropSide, setSprintDropSide] = useState(null);
   const [copied, setCopied] = useState(false);
   const [darkMode, setDarkMode] = useState(()=>{ try{ return localStorage.getItem("darkMode")!=="false"; }catch{ return true; } });
+  const [authed, setAuthed] = useState(()=>{ try{ return localStorage.getItem("rm_auth")==="1"; }catch{ return false; } });
+  const [passInput, setPassInput] = useState("");
+  const [passErr, setPassErr] = useState(false);
+
   const saveTimer = useRef(null);
   const history = useRef([]);
   const boardRef = useRef(null);
   const isPanning = useRef(false);
   const panStart = useRef({x:0,y:0,scrollX:0,scrollY:0});
+  const autoScrollRef = useRef(null);
 
   const T = darkMode ? DARK : LIGHT;
   const isPublic = new URLSearchParams(window.location.search).get("view")==="public";
   const editable = editMode&&filter==="all"&&!isPublic;
 
-  const labels = data?.labels||[];
-  const stickyNotes = data?.stickyNotes||[];
+  const setColWidthPersist = w => { setColWidth(w); try{ localStorage.setItem("colWidth",String(w)); }catch{}; };
 
-  const toggleDark = () => setDarkMode(d=>{ const next=!d; try{localStorage.setItem("darkMode",String(next));}catch{} return next; });
+  const submitPass = () => {
+    if (passInput===PASS) { setAuthed(true); try{ localStorage.setItem("rm_auth","1"); }catch{}; }
+    else { setPassErr(true); setPassInput(""); setTimeout(()=>setPassErr(false),1500); }
+  };
 
   useEffect(()=>{
     const bg=darkMode?DARK.bg:LIGHT.bg;
@@ -654,13 +674,34 @@ export default function App() {
       if((e.ctrlKey||e.metaKey)&&e.key==="z"&&!e.shiftKey){
         const tag=document.activeElement?.tagName;
         if(tag==="INPUT"||tag==="TEXTAREA") return;
-        e.preventDefault();
-        undo();
+        e.preventDefault(); undo();
       }
     };
     document.addEventListener("keydown",h);
     return ()=>document.removeEventListener("keydown",h);
   },[undo]);
+
+  const startAutoScroll = useCallback(clientX=>{
+    if(!boardRef.current) return;
+    cancelAnimationFrame(autoScrollRef.current);
+    const board=boardRef.current;
+    const scroll=()=>{
+      if(!boardRef.current) return;
+      const rect=board.getBoundingClientRect();
+      const ZONE=80; const SPEED=12;
+      if(clientX<rect.left+ZONE) board.scrollLeft-=SPEED;
+      else if(clientX>rect.right-ZONE) board.scrollLeft+=SPEED;
+      autoScrollRef.current=requestAnimationFrame(scroll);
+    };
+    autoScrollRef.current=requestAnimationFrame(scroll);
+  },[]);
+
+  const stopAutoScroll = useCallback(()=>{ cancelAnimationFrame(autoScrollRef.current); },[]);
+
+  const labels = data?.labels||[];
+  const stickyNotes = data?.stickyNotes||[];
+
+  const toggleDark = ()=>setDarkMode(d=>{ const next=!d; try{localStorage.setItem("darkMode",String(next));}catch{} return next; });
 
   const updLabels = fn=>upd(p=>({...p,labels:fn(p.labels||[])}));
   const addLabel = ()=>updLabels(ls=>[...ls,{id:newId(),name:"New label",colorId:LABEL_COLORS[ls.length%LABEL_COLORS.length].id}]);
@@ -672,10 +713,7 @@ export default function App() {
   const updateSticky = (id,ch)=>updStickies(ns=>ns.map(n=>n.id===id?{...n,...ch}:n));
   const deleteSticky = id=>updStickies(ns=>ns.filter(n=>n.id!==id));
 
-  const updateFeature = useCallback((fid,ch)=>upd(p=>({
-    ...p,
-    sprints:p.sprints.map(s=>({...s,features:s.features.map(f=>f.id===fid?{...f,...ch}:f)}))
-  })),[upd]);
+  const updateFeature = useCallback((fid,ch)=>upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.map(f=>f.id===fid?{...f,...ch}:f)}))})),[upd]);
   const deleteFeature = useCallback(fid=>upd(p=>({...p,sprints:p.sprints.map(s=>({...s,features:s.features.filter(f=>f.id!==fid)}))})),[upd]);
   const addFeature = useCallback(sid=>upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,features:[...s.features,{id:newId(),name:"New feature",size:"M",phases:{product:"not-started",design:"not-started",eng:"not-started"},estNum:"",estUnit:"days",note:"",owners:[],tasks:[],labelId:null}]}:s)})),[upd]);
   const updateSprint = useCallback((sid,ch)=>upd(p=>({...p,sprints:p.sprints.map(s=>s.id===sid?{...s,...ch}:s)})),[upd]);
@@ -683,9 +721,10 @@ export default function App() {
   const addSprint = useCallback(()=>upd(p=>({...p,sprints:[...p.sprints,{id:newId(),label:`Sprint ${58+p.sprints.length-3}`,dates:"Dates TBD",features:[]}]})),[upd]);
 
   const handleDragStart = useCallback(fid=>setDraggingId(fid),[]);
-  const handleDragEnd = useCallback(()=>{ setDraggingId(null); setDropTarget(null); },[]);
-  const handleDragOverCard = useCallback((sid,fid,pos)=>setDropTarget({sprintId:sid,featureId:fid,position:pos}),[]);
-  const handleDragOverEmpty = useCallback(sid=>setDropTarget({sprintId:sid,featureId:null,position:"after"}),[]);
+  const handleDragEnd = useCallback(()=>{ setDraggingId(null); setDropTarget(null); stopAutoScroll(); },[stopAutoScroll]);
+  const handleDragOverCard = useCallback((sid,fid,pos,e)=>{ setDropTarget({sprintId:sid,featureId:fid,position:pos}); if(e) startAutoScroll(e.clientX); },[startAutoScroll]);
+  const handleDragOverEmpty = useCallback((sid,e)=>{ setDropTarget({sprintId:sid,featureId:null,position:"after"}); if(e) startAutoScroll(e.clientX); },[startAutoScroll]);
+
   const handleDrop = useCallback(e=>{
     if(!editable) return; e.preventDefault(); if(!draggingId||!dropTarget) return;
     upd(prev=>{
@@ -695,24 +734,41 @@ export default function App() {
       sprints=sprints.map(s=>{ if(s.id!==dropTarget.sprintId) return s; const feats=[...s.features]; if(!dropTarget.featureId) feats.push(moved); else{ const idx=feats.findIndex(f=>f.id===dropTarget.featureId); feats.splice(dropTarget.position==="before"?idx:idx+1,0,moved); } return{...s,features:feats}; });
       return{...prev,sprints};
     });
-    setDraggingId(null); setDropTarget(null);
-  },[draggingId,dropTarget,editable,upd]);
+    setDraggingId(null); setDropTarget(null); stopAutoScroll();
+  },[draggingId,dropTarget,editable,upd,stopAutoScroll]);
 
   const handleSprintDragStart = useCallback(sid=>setDraggingSprintId(sid),[]);
-  const handleSprintDragOver = useCallback((sid,e)=>{ if(!e||!e.currentTarget) return; const rect=e.currentTarget.getBoundingClientRect(); setOverSprintId(sid); setSprintDropSide(e.clientX<rect.left+rect.width/2?"left":"right"); },[]);
-  const handleSprintDragEnd = useCallback(()=>{ setDraggingSprintId(null); setOverSprintId(null); setSprintDropSide(null); },[]);
+  const handleSprintDragOver = useCallback((sid,e)=>{ if(!e||!e.currentTarget) return; const rect=e.currentTarget.getBoundingClientRect(); setOverSprintId(sid); setSprintDropSide(e.clientX<rect.left+rect.width/2?"left":"right"); startAutoScroll(e.clientX); },[startAutoScroll]);
+  const handleSprintDragEnd = useCallback(()=>{ setDraggingSprintId(null); setOverSprintId(null); setSprintDropSide(null); stopAutoScroll(); },[stopAutoScroll]);
   const handleSprintDrop = useCallback((targetId,e)=>{
     if(!draggingSprintId||draggingSprintId===targetId) return;
     const rect=e.currentTarget.getBoundingClientRect(); const side=e.clientX<rect.left+rect.width/2?"left":"right";
     upd(prev=>{ const sprints=[...prev.sprints]; const fromIdx=sprints.findIndex(s=>s.id===draggingSprintId); const[moved]=sprints.splice(fromIdx,1); const toIdx=sprints.findIndex(s=>s.id===targetId); sprints.splice(side==="left"?toIdx:toIdx+1,0,moved); return{...prev,sprints}; });
-    setDraggingSprintId(null); setOverSprintId(null); setSprintDropSide(null);
-  },[draggingSprintId,upd]);
+    setDraggingSprintId(null); setOverSprintId(null); setSprintDropSide(null); stopAutoScroll();
+  },[draggingSprintId,upd,stopAutoScroll]);
 
   const onBoardMouseDown = e=>{ if(e.target!==boardRef.current) return; e.preventDefault(); isPanning.current=true; panStart.current={x:e.clientX,y:e.clientY,scrollX:boardRef.current.scrollLeft,scrollY:window.scrollY}; boardRef.current.style.cursor="grabbing"; boardRef.current.style.userSelect="none"; document.body.style.userSelect="none"; };
   const onBoardMouseMove = e=>{ if(!isPanning.current) return; e.preventDefault(); const dx=e.clientX-panStart.current.x; const dy=e.clientY-panStart.current.y; boardRef.current.scrollLeft=panStart.current.scrollX-dx; window.scrollTo(0,panStart.current.scrollY-dy); };
   const onBoardMouseUp = e=>{ if(!isPanning.current) return; isPanning.current=false; boardRef.current.style.userSelect=""; document.body.style.userSelect=""; if(boardRef.current) boardRef.current.style.cursor=(e&&e.target===boardRef.current)?"grab":"default"; };
   const onBoardMouseOverCard = e=>{ if(!boardRef.current||isPanning.current) return; boardRef.current.style.cursor=e.target===boardRef.current?"grab":"default"; };
   const copyPublicLink = ()=>{ const url=`${window.location.origin}${window.location.pathname}?view=public`; navigator.clipboard.writeText(url).then(()=>{ setCopied(true); setTimeout(()=>setCopied(false),2000); }); };
+
+  // Password gate
+  if (!authed) return (
+    <div style={{background:T.bg,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"system-ui"}}>
+      <div style={{background:T.bg2,border:`0.5px solid ${T.border2}`,borderRadius:16,padding:"40px 48px",display:"flex",flexDirection:"column",alignItems:"center",gap:20,boxShadow:"0 8px 32px rgba(0,0,0,.4)",minWidth:320}}>
+        <div style={{fontSize:28}}>🔒</div>
+        <div style={{fontSize:18,fontWeight:700,color:T.text}}>Roadmap</div>
+        <div style={{fontSize:13,color:T.text4}}>Enter password to continue</div>
+        <input autoFocus type="password" value={passInput} placeholder="Password"
+          onChange={e=>setPassInput(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&submitPass()}
+          style={{width:"100%",background:T.inputBg,border:`1.5px solid ${passErr?"#ef4444":T.inputBorder}`,borderRadius:8,color:T.text,fontSize:14,padding:"10px 14px",outline:"none",boxSizing:"border-box",transition:"border-color .2s",fontFamily:"system-ui"}}/>
+        {passErr && <div style={{fontSize:12,color:"#ef4444",marginTop:-12}}>Incorrect password</div>}
+        <button onClick={submitPass} style={{width:"100%",background:"#534AB7",border:"none",borderRadius:8,color:"#fff",fontSize:14,fontWeight:600,padding:"10px 0",cursor:"pointer"}}>Unlock</button>
+      </div>
+    </div>
+  );
 
   if(!data) return <div style={{background:T.bg,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",color:T.text5,fontFamily:"system-ui"}}>Loading roadmap…</div>;
 
@@ -738,7 +794,7 @@ export default function App() {
             <button onClick={toggleDark} title="Toggle light/dark" style={{padding:"4px 10px",borderRadius:20,fontSize:12,cursor:"pointer",border:`0.5px solid ${T.border}`,background:"transparent",color:T.text5}}>{darkMode?"☀️":"🌙"}</button>
             <div style={{display:"flex",alignItems:"center",gap:6}}>
               <span style={{fontSize:10,color:T.text5,whiteSpace:"nowrap"}}>⟷</span>
-              <input type="range" min={220} max={500} value={colWidth} onChange={e=>setColWidth(Number(e.target.value))} style={{width:70,accentColor:"#534AB7",cursor:"pointer"}}/>
+              <input type="range" min={220} max={500} value={colWidth} onChange={e=>setColWidthPersist(Number(e.target.value))} style={{width:70,accentColor:"#534AB7",cursor:"pointer"}}/>
             </div>
           </div>
         </div>
