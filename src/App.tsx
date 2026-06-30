@@ -1,14 +1,20 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
 const SUPABASE_URL = "https://fwktaxbgicooxmqleaho.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3a3RheGJnaWNvb3htcWxlYWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NTk3ODYsImV4cCI6MjA5MDEzNTc4Nn0._YNNkQn-jmvFziFAAWQbzxKEkpebQbYBfqg110WdDYo";
+const SUPABASE_KEY = "sb_publishable_MrE8AO9gKJRD2UUCt_NP6g_Gu-34P5S";
+const SUPABASE_HEADERS = {
+  "apikey": SUPABASE_KEY,
+  "Authorization": `Bearer ${SUPABASE_KEY}`,
+  "Content-Type": "application/json",
+  "x-client-info": "supabase-js/2"
+};
 const JIRA_BASE = "https://zenone.atlassian.net/browse";
 const PASS = "ZenOne2026";
 
 async function loadData() {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/roadmap?id=eq.main&select=data`, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+      headers: SUPABASE_HEADERS
     });
     const rows = await res.json();
     return rows?.[0]?.data || null;
@@ -19,7 +25,7 @@ async function saveData(data) {
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/roadmap?id=eq.main`, {
       method: "PATCH",
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      headers: { ...SUPABASE_HEADERS, "Prefer": "return=minimal" },
       body: JSON.stringify({ data, updated_at: new Date().toISOString() })
     });
   } catch {}
